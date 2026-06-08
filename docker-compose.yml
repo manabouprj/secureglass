@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  dashboard:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Phase 2: Backend API (uncomment when backend is built)
+  # api:
+  #   build: ./src
+  #   ports:
+  #     - "8000:8000"
+  #   env_file: .env
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   restart: unless-stopped
+
+  # postgres:
+  #   image: postgres:15-alpine
+  #   environment:
+  #     POSTGRES_DB: sentinelglass
+  #     POSTGRES_USER: ${POSTGRES_USER:-sentinelglass}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #     - ./migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/001.sql
+  #   restart: unless-stopped
+
+  # redis:
+  #   image: redis:7-alpine
+  #   restart: unless-stopped
+
+# volumes:
+#   postgres_data:

@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SecureGlass — Multi-Vertical Security Intelligence Platform</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg:#0a0e1a;--bg2:#0f1424;--bg3:#141929;--card:#141929;--card2:#1a2035;
+  --border:rgba(99,120,200,0.18);--border2:rgba(99,120,200,0.32);
+  --text:#e2e8f8;--text2:#8494b8;--text3:#4a5880;
+  --accent:#4f8bff;--accent2:#6366f1;
+  --red:#f43f5e;--red-bg:rgba(244,63,94,0.12);
+  --orange:#fb923c;--orange-bg:rgba(251,146,60,0.12);
+  --yellow:#fbbf24;--yellow-bg:rgba(251,191,36,0.1);
+  --green:#22d3a5;--green-bg:rgba(34,211,165,0.1);
+  --blue:#4f8bff;--blue-bg:rgba(79,139,255,0.1);
+  --purple:#a78bfa;--purple-bg:rgba(167,139,250,0.1);
+  --v-accent:#4f8bff;
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --radius:10px;--radius-lg:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;min-height:100vh;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--v-accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;transition:background 0.4s;}
+.brand-name{font-size:14px;font-weight:700;letter-spacing:-0.3px;}
+.brand-sub{font-size:10px;color:var(--text3);margin-top:1px;}
+.topbar-nav{display:flex;gap:2px;}
+.nav-btn{padding:5px 13px;border-radius:6px;border:none;background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all 0.15s;font-family:var(--font);}
+.nav-btn:hover{background:var(--bg3);color:var(--text);}
+.nav-btn.active{background:var(--blue-bg);color:var(--accent);font-weight:600;}
+.topbar-right{display:flex;align-items:center;gap:14px;}
+.live-badge{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:600;}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+.ts{font-size:11px;color:var(--text3);}
+
+/* ── VERTICAL SWITCHER ── */
+.v-switcher{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:8px;height:42px;overflow-x:auto;}
+.v-switcher::-webkit-scrollbar{display:none;}
+.v-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-right:4px;white-space:nowrap;}
+.v-btn{padding:4px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all 0.2s;white-space:nowrap;letter-spacing:.2px;}
+.v-btn:hover{border-color:var(--border2);color:var(--text);}
+.v-btn.active{color:#fff;border-color:transparent;}
+
+/* ── MAIN ── */
+.main{padding:16px 20px;max-width:1680px;margin:0 auto;}
+
+/* ── ATTACK BANNER ── */
+.attack-banner{border-radius:var(--radius);padding:11px 16px;display:flex;align-items:center;gap:12px;margin-bottom:16px;border:1px solid;animation:bpulse 2.5s infinite;}
+@keyframes bpulse{0%,100%{opacity:1;}50%{opacity:.85;}}
+.attack-title{font-size:12px;font-weight:700;margin-bottom:2px;}
+.attack-desc{font-size:11px;opacity:.8;}
+.attack-actions{margin-left:auto;display:flex;gap:7px;flex-shrink:0;}
+.btn-sm{padding:4px 11px;border-radius:6px;border:1px solid;font-size:11px;cursor:pointer;font-weight:600;font-family:var(--font);transition:all .15s;}
+
+/* ── GRIDS ── */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.row-main{display:grid;grid-template-columns:210px 1fr 265px;gap:12px;margin-bottom:16px;}
+.row-mid{display:grid;grid-template-columns:1fr 1.4fr;gap:12px;margin-bottom:16px;}
+.row-bot{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin-bottom:16px;}
+.row-kpi3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.card-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;}
+.card-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;}
+
+/* ── POSTURE RING ── */
+.posture-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;display:flex;flex-direction:column;align-items:center;}
+.posture-ring-wrap{position:relative;width:130px;height:130px;margin:6px 0 10px;}
+.pr-svg{transform:rotate(-90deg);}
+.pr-track{fill:none;stroke:var(--bg3);stroke-width:10;}
+.pr-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.5s ease,stroke .4s;}
+.pr-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.pr-num{font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1;}
+.pr-sub{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.posture-grade{font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-bottom:8px;}
+.domain-scores{width:100%;display:flex;flex-direction:column;gap:7px;margin-top:4px;}
+.domain-row{display:flex;align-items:center;gap:7px;}
+.domain-name{font-size:10px;color:var(--text2);width:72px;flex-shrink:0;}
+.domain-bar-wrap{flex:1;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.domain-bar{height:100%;border-radius:2px;transition:width 1s ease;}
+.domain-val{font-size:10px;color:var(--text2);width:24px;text-align:right;flex-shrink:0;}
+
+/* ── METRIC CARDS ── */
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;}
+.metric-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px;}
+.metric-val{font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1;margin-bottom:3px;}
+.metric-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.metric-change{font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;}
+.change-up{background:var(--red-bg);color:var(--red);}
+.change-dn{background:var(--green-bg);color:var(--green);}
+.change-flat{background:var(--yellow-bg);color:var(--yellow);}
+
+/* ── ATTACK PREDICTION ── */
+.threat-meter-wrap{position:relative;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin:8px 0 5px;}
+.threat-meter-fill{position:absolute;left:0;top:0;height:100%;border-radius:4px;transition:width 1.5s ease;}
+.threat-zones{display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-bottom:10px;}
+.threat-indicators{display:flex;flex-direction:column;gap:6px;}
+.threat-item{display:flex;align-items:center;gap:7px;font-size:11px;}
+.threat-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.threat-item-label{color:var(--text2);flex:1;}
+.threat-item-val{color:var(--text);font-weight:600;}
+
+/* ── ALERTS ── */
+.alert-list{display:flex;flex-direction:column;gap:5px;}
+.alert-row{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;background:var(--bg3);border-radius:7px;border-left:3px solid;cursor:pointer;transition:background .15s;}
+.alert-row:hover{background:var(--card2);}
+.alert-sev{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:2px 5px;border-radius:3px;flex-shrink:0;margin-top:1px;}
+.sev-critical{color:var(--red);background:var(--red-bg);}
+.sev-high{color:var(--orange);background:var(--orange-bg);}
+.sev-medium{color:var(--yellow);background:var(--yellow-bg);}
+.sev-low{color:var(--green);background:var(--green-bg);}
+.alert-content{flex:1;min-width:0;}
+.alert-title{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.alert-meta{font-size:10px;color:var(--text3);margin-top:2px;}
+.alert-tool{font-size:10px;color:var(--accent);font-weight:600;flex-shrink:0;margin-top:2px;}
+
+/* ── REGION TABLE ── */
+.region-table{width:100%;border-collapse:collapse;}
+.region-table th{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;padding:0 7px 7px;text-align:left;border-bottom:1px solid var(--border);}
+.region-table td{padding:8px 7px;font-size:11px;border-bottom:1px solid rgba(99,120,200,.07);color:var(--text);}
+.region-table tr:hover td{background:var(--bg3);}
+.risk-pill{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.3px;}
+.risk-critical{background:var(--red-bg);color:var(--red);}
+.risk-high{background:var(--orange-bg);color:var(--orange);}
+.risk-medium{background:var(--yellow-bg);color:var(--yellow);}
+.risk-low{background:var(--green-bg);color:var(--green);}
+.cov-bar-wrap{display:flex;align-items:center;gap:6px;}
+.cov-bar-bg{flex:1;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.cov-bar-fill{height:100%;border-radius:2px;background:var(--green);transition:width 1s ease;}
+.cov-val{font-size:10px;color:var(--text2);min-width:32px;text-align:right;}
+
+/* ── MITRE ── */
+.mitre-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;}
+.mitre-cell{padding:7px 5px;border-radius:5px;text-align:center;cursor:pointer;transition:opacity .15s;}
+.mitre-cell:hover{opacity:.82;}
+.mitre-tactic{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.2px;margin-bottom:2px;color:rgba(255,255,255,.8);}
+.mitre-count{font-size:14px;font-weight:700;color:#fff;}
+
+/* ── TOOL GRID ── */
+.tool-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.tool-item{background:var(--bg3);border-radius:7px;padding:9px;display:flex;align-items:center;gap:7px;}
+.tool-status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.tool-name{font-size:10px;color:var(--text2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tool-count{font-size:11px;font-weight:700;color:var(--text);}
+
+/* ── COMPLIANCE ── */
+.compliance-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(99,120,200,.07);}
+.compliance-row:last-child{border-bottom:none;}
+.compliance-name{font-size:11px;color:var(--text);flex:1;}
+.compliance-bar-wrap{width:72px;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.compliance-bar-fill{height:100%;border-radius:2px;transition:width 1s ease;}
+.compliance-score{font-size:12px;font-weight:700;width:36px;text-align:right;}
+
+/* ── EXEC SUMMARY ── */
+.exec-summary{font-size:12px;color:var(--text2);line-height:1.75;padding:13px 15px;background:var(--bg3);border-radius:7px;border-left:3px solid var(--v-accent);font-style:italic;transition:border-color .4s;}
+
+/* ── TIMELINE ── */
+.timeline{display:flex;flex-direction:column;}
+.tl-item{display:flex;gap:12px;padding-bottom:14px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-left{display:flex;flex-direction:column;align-items:center;width:12px;flex-shrink:0;}
+.tl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:2px;}
+.tl-line{width:2px;flex:1;background:var(--border);margin-top:3px;min-height:18px;}
+.tl-item:last-child .tl-line{display:none;}
+.tl-title{font-size:11px;color:var(--text);margin-bottom:2px;}
+.tl-meta{font-size:10px;color:var(--text3);}
+
+/* ── SCROLL ── */
+.scroll{max-height:360px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.scroll::-webkit-scrollbar{width:3px;}
+.scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* ── CHART ── */
+.chart-wrap{position:relative;width:100%;}
+
+/* ── VIEWS ── */
+.view-panel{display:none;}
+.view-panel.active{display:block;}
+
+/* ── FOOTER ── */
+.footer{text-align:center;padding:14px 20px;font-size:10px;color:var(--text3);border-top:1px solid var(--border);margin-top:4px;}
+
+/* ── VERTICAL ACCENT TRANSITIONS ── */
+.v-accent-text{color:var(--v-accent);transition:color .4s;}
+.v-accent-bg{background:var(--v-accent);transition:background .4s;}
+.v-accent-border{border-color:var(--v-accent)!important;transition:border-color .4s;}
+
+/* ── VERTICAL LABELS ── */
+#v-sector-label{font-size:11px;color:var(--text2);transition:color .3s;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <div class="brand">
+    <div class="brand-icon" id="brand-icon">🛡️</div>
+    <div>
+      <div class="brand-name">SecureGlass</div>
+      <div class="brand-sub" id="v-sector-label">Enterprise Security · 80 Countries</div>
+    </div>
+  </div>
+  <div class="topbar-nav">
+    <button class="nav-btn active" onclick="switchView('overview',this)">Overview</button>
+    <button class="nav-btn" onclick="switchView('alerts',this)">Alert Feed</button>
+    <button class="nav-btn" onclick="switchView('threat',this)">Threat Intel</button>
+    <button class="nav-btn" onclick="switchView('compliance',this)">Compliance</button>
+    <button class="nav-btn" onclick="switchView('assets',this)">Assets</button>
+  </div>
+  <div class="topbar-right">
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <div class="ts" id="last-update">--</div>
+  </div>
+</nav>
+
+<!-- VERTICAL SWITCHER -->
+<div class="v-switcher">
+  <span class="v-label">Vertical:</span>
+  <button class="v-btn active" id="vbtn-enterprise" onclick="switchVertical('enterprise',this)">🏢 Enterprise</button>
+  <button class="v-btn" id="vbtn-healthcare" onclick="switchVertical('healthcare',this)">🏥 Healthcare</button>
+  <button class="v-btn" id="vbtn-financial" onclick="switchVertical('financial',this)">🏦 Financial Services</button>
+  <button class="v-btn" id="vbtn-energy" onclick="switchVertical('energy',this)">⚡ Oil &amp; Gas / Energy</button>
+  <button class="v-btn" id="vbtn-retail" onclick="switchVertical('retail',this)">🛒 Retail &amp; E-Commerce</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ATTACK BANNER -->
+  <div class="attack-banner" id="attack-banner" style="background:rgba(244,63,94,.1);border-color:rgba(244,63,94,.35);">
+    <span style="font-size:18px;">⚠️</span>
+    <div>
+      <div class="attack-title" style="color:var(--red);" id="banner-title">ELEVATED THREAT — Active Campaign Indicators Detected</div>
+      <div class="attack-desc" style="color:rgba(244,63,94,.8);" id="banner-desc">CrowdStrike + Vectra AI + Recorded Future corroborate Ransomware activity. Confidence: HIGH (82%). Threat actor: TA505.</div>
+    </div>
+    <div class="attack-actions">
+      <button class="btn-sm" id="banner-btn" style="background:var(--red-bg);border-color:rgba(244,63,94,.4);color:var(--red);">Initiate IR</button>
+      <button class="btn-sm" onclick="document.getElementById('attack-banner').style.display='none'" style="background:transparent;border-color:var(--border);color:var(--text2);">Dismiss</button>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       VIEW: OVERVIEW
+  ====================================================== -->
+  <div class="view-panel active" id="view-overview">
+
+    <!-- KPI ROW -->
+    <div class="g4">
+      <div class="metric-card">
+        <div class="metric-icon" style="background:var(--red-bg);">🔴</div>
+        <div class="metric-val" style="color:var(--red);" id="m-critical">112</div>
+        <div class="metric-label" id="ml-critical">Critical Alerts</div>
+        <span class="metric-change change-up" id="mc-critical">↑ 14 vs yesterday</span>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" style="background:var(--orange-bg);">🟠</div>
+        <div class="metric-val" style="color:var(--orange);" id="m-high">312</div>
+        <div class="metric-label" id="ml-high">High Alerts</div>
+        <span class="metric-change change-up">↑ 28 vs yesterday</span>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" style="background:var(--blue-bg);" id="m3-icon">📋</div>
+        <div class="metric-val v-accent-text" id="m-incidents">8</div>
+        <div class="metric-label" id="ml-incidents">Active Incidents</div>
+        <span class="metric-change change-flat">→ Same as yesterday</span>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" style="background:var(--green-bg);">⏱️</div>
+        <div class="metric-val" style="color:var(--green);" id="m-mttd">15.6m</div>
+        <div class="metric-label" id="ml-mttd">Avg. MTTD</div>
+        <span class="metric-change change-dn">↓ 4m vs last week</span>
+      </div>
+    </div>
+
+    <!-- POSTURE + TREND + ATTACK PRED -->
+    <div class="row-main">
+      <!-- Posture -->
+      <div class="posture-card">
+        <div class="card-title" style="margin-bottom:4px;" id="posture-title">Security Posture</div>
+        <div class="posture-ring-wrap">
+          <svg class="pr-svg" width="130" height="130" viewBox="0 0 130 130">
+            <circle class="pr-track" cx="65" cy="65" r="50"/>
+            <circle class="pr-fill" id="posture-ring" cx="65" cy="65" r="50" stroke="#fb923c" stroke-dasharray="314.16" stroke-dashoffset="160"/>
+          </svg>
+          <div class="pr-text">
+            <div class="pr-num" id="posture-num" style="color:var(--orange);">49</div>
+            <div class="pr-sub">/100</div>
+          </div>
+        </div>
+        <div class="posture-grade" id="posture-grade" style="background:var(--orange-bg);color:var(--orange);">C — Moderate Risk</div>
+        <div class="domain-scores" id="domain-scores"></div>
+      </div>
+
+      <!-- Trend -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">30-Day Posture Trend</span>
+          <span style="font-size:10px;color:var(--text3);" id="trend-note">Score range: 40–92</span>
+        </div>
+        <div class="chart-wrap" style="height:186px;">
+          <canvas id="trendChart" role="img" aria-label="30-day posture trend">Posture trend</canvas>
+        </div>
+      </div>
+
+      <!-- Attack Prediction -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Attack Prediction</span>
+          <span class="card-badge" id="pred-badge" style="background:var(--red-bg);color:var(--red);">HIGH RISK</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">Next 24h probability</div>
+        <div style="font-size:26px;font-weight:700;margin-bottom:3px;" id="pred-pct" style="color:var(--red);">82%</div>
+        <div class="threat-meter-wrap"><div class="threat-meter-fill" id="pred-meter" style="width:82%;background:linear-gradient(90deg,var(--yellow),var(--orange),var(--red));"></div></div>
+        <div class="threat-zones"><span>Low</span><span>Med</span><span>High</span><span>Crit</span></div>
+        <div class="threat-indicators" id="threat-indicators"></div>
+      </div>
+    </div>
+
+    <!-- TOOL DIST + PRIORITY ALERTS -->
+    <div class="row-mid">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title" id="tool-chart-title">Alerts by Control</span>
+        </div>
+        <div class="chart-wrap" style="height:210px;">
+          <canvas id="toolChart" role="img" aria-label="Alert counts by security control">Alert distribution by tool</canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Priority Alert Feed</span>
+          <span class="card-badge" style="background:var(--red-bg);color:var(--red);" id="feed-badge">112 Critical</span>
+        </div>
+        <div class="scroll" id="alert-feed"></div>
+      </div>
+    </div>
+
+    <!-- REGION TABLE + MITRE -->
+    <div class="row-bot">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title" id="region-title">Global Risk by Region</span>
+          <span class="card-badge" style="background:var(--blue-bg);color:var(--accent);" id="region-badge">12 regions</span>
+        </div>
+        <table class="region-table">
+          <thead><tr>
+            <th>Region</th><th>Risk</th><th>Critical</th><th>High</th><th id="cov-col-hdr">EDR Coverage</th><th>Assets</th>
+          </tr></thead>
+          <tbody id="region-tbody"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">MITRE ATT&amp;CK Coverage</span></div>
+        <div class="mitre-grid" id="mitre-grid"></div>
+        <div style="display:flex;gap:10px;margin-top:10px;font-size:9px;color:var(--text3);">
+          <span style="display:flex;align-items:center;gap:3px;"><span style="width:9px;height:9px;border-radius:2px;background:#1e293b;display:inline-block;"></span>None</span>
+          <span style="display:flex;align-items:center;gap:3px;"><span style="width:9px;height:9px;border-radius:2px;background:#1e3a5f;display:inline-block;"></span>Low</span>
+          <span style="display:flex;align-items:center;gap:3px;"><span style="width:9px;height:9px;border-radius:2px;background:#b45309;display:inline-block;"></span>Medium</span>
+          <span style="display:flex;align-items:center;gap:3px;"><span style="width:9px;height:9px;border-radius:2px;background:#991b1b;display:inline-block;"></span>High</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEV DONUT + MTTR + CLOUD -->
+    <div class="row-kpi3">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Severity Distribution</span></div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="chart-wrap" style="height:120px;width:120px;flex-shrink:0;">
+            <canvas id="sevChart" role="img" aria-label="Severity donut chart">Severity chart</canvas>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;" id="sev-legend"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">MTTD / MTTR Trend (30d)</span></div>
+        <div class="chart-wrap" style="height:120px;">
+          <canvas id="mttrChart" role="img" aria-label="MTTD and MTTR trend">MTTD MTTR chart</canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title" id="cloud-chart-title">Alerts by Platform</span></div>
+        <div class="chart-wrap" style="height:120px;">
+          <canvas id="cloudChart" role="img" aria-label="Alerts by cloud platform">Platform chart</canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOL STATUS -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <span class="card-title">Security Control Integration Status</span>
+        <span class="card-badge" style="background:var(--green-bg);color:var(--green);" id="tool-status-badge">20/20 Connected</span>
+      </div>
+      <div class="tool-grid" id="tool-grid"></div>
+    </div>
+
+    <!-- AI EXEC SUMMARY -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <span class="card-title">AI Executive Summary</span>
+        <span class="card-badge" style="background:var(--purple-bg);color:var(--purple);">Claude AI</span>
+      </div>
+      <div class="exec-summary v-accent-border" id="exec-summary"></div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       VIEW: ALERT FEED
+  ====================================================== -->
+  <div class="view-panel" id="view-alerts">
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <span class="card-title">Full Alert Feed</span>
+        <div style="display:flex;gap:7px;">
+          <select id="sev-filter" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 8px;border-radius:6px;font-size:11px;font-family:var(--font);">
+            <option value="">All Severities</option>
+            <option value="CRITICAL">Critical</option>
+            <option value="HIGH">High</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="LOW">Low</option>
+          </select>
+          <select id="tool-filter" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 8px;border-radius:6px;font-size:11px;font-family:var(--font);">
+            <option value="">All Tools</option>
+          </select>
+        </div>
+      </div>
+      <div class="scroll" id="full-alert-feed" style="max-height:580px;"></div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       VIEW: THREAT INTEL
+  ====================================================== -->
+  <div class="view-panel" id="view-threat">
+    <div class="g2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Active Threat Actors</span></div>
+        <div id="threat-actors" style="display:flex;flex-direction:column;gap:9px;"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">IOC Summary</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;" id="ioc-summary"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title" id="brand-title">Dark Web &amp; Brand Monitoring</span></div>
+      <div id="brand-alerts" style="display:flex;flex-direction:column;gap:7px;"></div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       VIEW: COMPLIANCE
+  ====================================================== -->
+  <div class="view-panel" id="view-compliance">
+    <div class="g2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Compliance by Framework</span></div>
+        <div id="compliance-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Compliance Trend (90 Days)</span></div>
+        <div class="chart-wrap" style="height:210px;">
+          <canvas id="complianceChart" role="img" aria-label="Compliance trend">Compliance trend</canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       VIEW: ASSETS
+  ====================================================== -->
+  <div class="view-panel" id="view-assets">
+    <div class="g4" style="margin-bottom:16px;">
+      <div class="metric-card">
+        <div class="metric-val v-accent-text" id="a-total">46,200</div>
+        <div class="metric-label" id="al-total">Total Managed Assets</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" style="color:var(--green);" id="a-edr">91.3%</div>
+        <div class="metric-label" id="al-edr">EDR Coverage</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" style="color:var(--yellow);" id="a-vmdr">88.7%</div>
+        <div class="metric-label" id="al-vmdr">VMDR Scanned</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" style="color:var(--red);" id="a-gaps">4,020</div>
+        <div class="metric-label">Coverage Gaps</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Asset Coverage by Region &amp; Control</span></div>
+      <div id="asset-coverage-table"></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="footer">
+  SecureGlass v1.1 — Multi-Vertical Security Intelligence Platform · Demo Mode (Synthetic Data) ·
+  <span id="footer-controls">20 Controls</span> ·
+  GitHub: github.com/manabouprj/secureglass
+</div>
+
+<script>
+// ============================================================
+// VERTICAL CONFIGURATION — all industry-specific data lives here
+// ============================================================
+const VERTICALS = {
+
+  enterprise: {
+    label:'Enterprise Security · 80 Countries',
+    icon:'🛡️',
+    accent:'#4f8bff',
+    accentBtn:'#1e3a5f',
+    posture:49,
+    postureGrade:'C — Moderate Risk',
+    postureGradeColor:'var(--orange)',
+    postureGradeBg:'var(--orange-bg)',
+    ringColor:'#fb923c',
+    critCount:112, highCount:312, incidents:8, mttd:'15.6m',
+    attackPct:82, attackVector:'Ransomware', attackSecondary:'Data Exfil',
+    attackActor:'TA505', attackConfidence:'HIGH',
+    attackSources:'CrowdStrike + Vectra AI + RF',
+    banner:'ELEVATED THREAT — Active Campaign Indicators Detected',
+    bannerDesc:'CrowdStrike + Vectra AI + Recorded Future corroborate Ransomware activity. Confidence: HIGH (82%). Threat actor: TA505.',
+    bannerBtn:'Initiate IR',
+    domains:[
+      {name:'Endpoint',score:54.8,color:'#fb923c'},
+      {name:'Cloud',score:53.6,color:'#4f8bff'},
+      {name:'Identity',score:53.7,color:'#a78bfa'},
+      {name:'Email',score:49.2,color:'#f43f5e'},
+      {name:'Network',score:54.6,color:'#22d3a5'},
+      {name:'Vuln.',score:38.9,color:'#fbbf24'},
+    ],
+    tools:[
+      {n:'CrowdStrike EDR',c:80,s:'ok'},{n:'Mimecast Email',c:60,s:'ok'},
+      {n:'Qualys VMDR',c:70,s:'ok'},{n:'Wiz CSPM',c:50,s:'ok'},
+      {n:'Symantec DLP',c:40,s:'ok'},{n:'Recorded Future',c:30,s:'ok'},
+      {n:'Salt Security',c:35,s:'ok'},{n:'Vectra AI',c:40,s:'ok'},
+      {n:'CyberArk PAM',c:30,s:'ok'},{n:'Zscaler SASE',c:35,s:'ok'},
+      {n:'Cloudflare WAF',c:45,s:'ok'},{n:'ExtraHop NDR',c:25,s:'ok'},
+      {n:'MS Intune MDM',c:20,s:'ok'},{n:'KnowBe4',c:15,s:'warn'},
+      {n:'MS Sentinel',c:25,s:'ok'},{n:'Palo Alto NGFW',c:30,s:'ok'},
+      {n:'Axonius',c:10,s:'ok'},{n:'Prisma Cloud',c:30,s:'ok'},
+      {n:'Darktrace',c:20,s:'ok'},{n:'Veeam Backup',c:10,s:'ok'},
+    ],
+    sevData:[112,312,215,50,11],
+    cloudLabels:['Azure','AWS','GCP','On-Prem','SaaS'],
+    cloudData:[245,210,105,105,35],
+    cloudColors:['#1e40af','#d97706','#065f46','#4a5880','#7c3aed'],
+    cloudChartTitle:'Alerts by Cloud Platform',
+    toolChartTitle:'Alerts by Control (700 total)',
+    covColHdr:'EDR Coverage',
+    regionTitle:'Global Risk by Region (80 Countries)',
+    regionBadge:'12 regions',
+    postureTitle:'Security Posture',
+    feedBadge:'112 Critical',
+    toolStatusBadge:'20/20 Connected',
+    brandTitle:'Dark Web & Brand Monitoring — Recorded Future / ZeroFox',
+    compliance:[
+      {name:'ISO 27001:2022',score:72,color:'#4f8bff'},
+      {name:'GDPR',score:64,color:'#f43f5e'},
+      {name:'NCA CSF (UAE)',score:68,color:'#22d3a5'},
+      {name:'SOC 2 Type II',score:75,color:'#a78bfa'},
+      {name:'PCI DSS v4.0',score:81,color:'#fbbf24'},
+      {name:'NIST CSF 2.0',score:66,color:'#fb923c'},
+      {name:'DIFC PDPL',score:59,color:'#f43f5e'},
+      {name:'CIS Controls v8',score:71,color:'#22d3a5'},
+    ],
+    alerts:[
+      {sev:'CRITICAL',tool:'CrowdStrike',title:'Mimikatz credential dumping — ws-7823',time:'2m ago',region:'AE'},
+      {sev:'CRITICAL',tool:'Recorded Future',title:'Employee credentials found on dark web forum',time:'8m ago',region:'GB'},
+      {sev:'CRITICAL',tool:'Wiz',title:'Publicly exposed S3 bucket with PII data',time:'15m ago',region:'US'},
+      {sev:'CRITICAL',tool:'Salt Security',title:'API credential stuffing: 450 failed auth/min',time:'22m ago',region:'SG'},
+      {sev:'CRITICAL',tool:'CrowdStrike',title:'Ransomware-like behaviour: mass file encryption',time:'31m ago',region:'ZA'},
+      {sev:'CRITICAL',tool:'Mimecast',title:'CEO impersonation — wire fraud attempt',time:'45m ago',region:'AE'},
+      {sev:'CRITICAL',tool:'Vectra AI',title:'Beaconing to newly registered domain',time:'52m ago',region:'GB'},
+      {sev:'CRITICAL',tool:'Symantec DLP',title:'2,400 customer records sent to personal Gmail',time:'1h ago',region:'US'},
+      {sev:'HIGH',tool:'Qualys',title:'CVE-2024-3400 unpatched on 12 PAN-OS firewalls',time:'1h ago',region:'DE'},
+      {sev:'HIGH',tool:'CyberArk',title:'Domain Admin login outside business hours',time:'1.5h ago',region:'SG'},
+      {sev:'HIGH',tool:'Wiz',title:'Overly permissive IAM: iam:* on prod account',time:'2h ago',region:'US'},
+      {sev:'HIGH',tool:'ExtraHop',title:'DNS tunnelling — covert C2 channel detected',time:'2.5h ago',region:'BR'},
+    ],
+    threatActors:[
+      {name:'TA505 (Evil Corp)',conf:'HIGH',ttps:'Ransomware, BEC, Banking Trojans',active:true},
+      {name:'APT28 (Fancy Bear)',conf:'MEDIUM',ttps:'Phishing, Credential Harvesting',active:true},
+      {name:'Lazarus Group (DPRK)',conf:'MEDIUM',ttps:'Supply chain, Financial theft',active:false},
+    ],
+    brandAlerts:[
+      {sev:'CRITICAL',title:'Typosquat domain c0mpany-portal.com registered 3h ago',source:'Recorded Future',action:'Takedown Requested'},
+      {sev:'HIGH',title:'Employee credentials listed on RaidForums dark web leak',source:'ZeroFox',action:'Password Reset'},
+      {sev:'HIGH',title:'Fake LinkedIn profile impersonating CISO detected',source:'ZeroFox',action:'Report Filed'},
+      {sev:'MEDIUM',title:'Brand mentioned in ransomware forum — threat monitoring',source:'Recorded Future',action:'Monitoring'},
+    ],
+    iocs:[
+      {type:'Malicious IPs',count:47,icon:'🌐'},
+      {type:'Malicious Domains',count:23,icon:'🔗'},
+      {type:'File Hashes',count:89,icon:'#️⃣'},
+      {type:'Phishing URLs',count:31,icon:'🎣'},
+    ],
+    execSummary:`The organisation is currently experiencing elevated threat activity with a security posture score of 49/100, indicating a moderate-to-high risk environment. CrowdStrike has detected active credential dumping and ransomware-like behaviour on endpoints, while Vectra AI has confirmed C2 beaconing to a newly registered domain — together suggesting the early stages of a coordinated intrusion campaign attributed to threat actor TA505.
+<br><br>The most critical exposure areas are endpoint protection (LSASS and Cobalt Strike detections across 7 hosts), cloud misconfiguration (publicly exposed S3 bucket with PII, overly permissive IAM in AWS production), and data loss risk (2,400 customer records sent externally). Qualys reports 47 systems overdue on critical patches including CVE-2024-3400 on perimeter firewalls.
+<br><br>Immediate priorities: (1) Isolate the 7 flagged endpoints and revoke credentials, (2) Remediate the exposed S3 bucket within 4 hours, (3) Emergency patching of CVE-2024-3400, (4) Activate the incident response retainer. MTTR of 96 minutes is above the 60-minute SLA target.`,
+    assetTotal:'46,200', assetEDR:'91.3%', assetVMDR:'88.7%', assetGaps:'4,020',
+    assetEDRLabel:'EDR (CrowdStrike)', assetVMDRLabel:'VMDR (Qualys)',
+    regionData:[
+      {code:'AE',name:'UAE',risk:'HIGH',critical:1,high:17,medium:17,cov:77.4,assets:4200},
+      {code:'GB',name:'United Kingdom',risk:'HIGH',critical:3,high:9,medium:16,cov:89.7,assets:8500},
+      {code:'US',name:'United States',risk:'MEDIUM',critical:2,high:7,medium:16,cov:94.9,assets:12000},
+      {code:'DE',name:'Germany',risk:'LOW',critical:0,high:5,medium:18,cov:96.1,assets:5200},
+      {code:'SG',name:'Singapore',risk:'HIGH',critical:4,high:13,medium:14,cov:83.2,assets:3100},
+      {code:'ZA',name:'South Africa',risk:'CRITICAL',critical:7,high:18,medium:22,cov:68.5,assets:2200},
+      {code:'BR',name:'Brazil',risk:'HIGH',critical:2,high:11,medium:19,cov:74.8,assets:2800},
+      {code:'IN',name:'India',risk:'MEDIUM',critical:1,high:8,medium:20,cov:87.3,assets:6300},
+      {code:'FR',name:'France',risk:'LOW',critical:0,high:4,medium:12,cov:92.4,assets:3800},
+      {code:'JP',name:'Japan',risk:'MEDIUM',critical:1,high:6,medium:11,cov:91.0,assets:2900},
+      {code:'AU',name:'Australia',risk:'LOW',critical:0,high:3,medium:9,cov:95.2,assets:3200},
+      {code:'CA',name:'Canada',risk:'LOW',critical:0,high:4,medium:8,cov:93.7,assets:2600},
+    ],
+    mitre:[
+      {t:'Initial Access',c:89,col:'#991b1b'},{t:'Execution',c:45,col:'#b45309'},
+      {t:'Persistence',c:38,col:'#b45309'},{t:'Priv. Escalation',c:52,col:'#991b1b'},
+      {t:'Defense Evasion',c:31,col:'#1e3a5f'},{t:'Cred. Access',c:67,col:'#991b1b'},
+      {t:'Discovery',c:22,col:'#1e3a5f'},{t:'Lateral Movement',c:41,col:'#b45309'},
+      {t:'Collection',c:28,col:'#1e3a5f'},{t:'C2',c:58,col:'#991b1b'},
+      {t:'Exfiltration',c:33,col:'#b45309'},{t:'Impact',c:18,col:'#1e3a5f'},
+    ],
+    postureTrend:[68.2,65.4,70.1,71.8,69.3,66.8,64.2,61.5,58.9,55.4,52.1,49.8,47.2,45.6,48.3,50.9,53.2,51.4,49.6,49.1,51.9,50.4,49.3,51.2,52.8,51.0,50.1,51.4,49.6,49.3],
+  },
+
+  healthcare: {
+    label:'Healthcare Security · NHS / Hospital Networks',
+    icon:'🏥',
+    accent:'#06b6d4',
+    accentBtn:'#0c4a6e',
+    posture:56,
+    postureGrade:'C — Patient Data at Risk',
+    postureGradeColor:'#fb923c',
+    postureGradeBg:'var(--orange-bg)',
+    ringColor:'#06b6d4',
+    critCount:74, highCount:218, incidents:5, mttd:'22.1m',
+    attackPct:71, attackVector:'Ransomware (Med. Devices)', attackSecondary:'PHI Exfiltration',
+    attackActor:'Hive / BlackCat', attackConfidence:'MEDIUM',
+    attackSources:'SentinelOne + Claroty + DarkOwl',
+    banner:'CRITICAL — Medical Device Network Compromise Suspected',
+    bannerDesc:'Claroty (OT/IoT) and SentinelOne detect lateral movement from unmanaged infusion pumps toward EMR servers. Hive ransomware IOCs confirmed.',
+    bannerBtn:'Isolate Device Segment',
+    domains:[
+      {name:'Endpoint',score:61.2,color:'#06b6d4'},
+      {name:'Med. Devices',score:42.5,color:'#f43f5e'},
+      {name:'Identity',score:58.0,color:'#a78bfa'},
+      {name:'Email',score:53.4,color:'#fbbf24'},
+      {name:'Network',score:60.1,color:'#22d3a5'},
+      {name:'PHI / DLP',score:49.8,color:'#fb923c'},
+    ],
+    tools:[
+      {n:'SentinelOne EDR',c:74,s:'ok'},{n:'Proofpoint Email',c:55,s:'ok'},
+      {n:'Tenable.io VMDR',c:62,s:'ok'},{n:'Claroty OT/IoT',c:48,s:'ok'},
+      {n:'Imprivata IAM',c:35,s:'ok'},{n:'Armis Med. Devices',c:41,s:'ok'},
+      {n:'Varonis DLP',c:29,s:'ok'},{n:'CrowdStrike (Admin)',c:30,s:'ok'},
+      {n:'Cisco XDR',c:22,s:'ok'},{n:'Zscaler SASE',c:28,s:'ok'},
+      {n:'Palo Alto WAF',c:38,s:'ok'},{n:'Nozomi Networks',c:20,s:'warn'},
+      {n:'Jamf MDM',c:15,s:'ok'},{n:'Medigate',c:33,s:'ok'},
+      {n:'Splunk SIEM',c:22,s:'ok'},{n:'F5 WAF',c:18,s:'ok'},
+      {n:'Recorded Future',c:12,s:'ok'},{n:'NetSPI (Pen Test)',c:8,s:'ok'},
+      {n:'Qualys WAS',c:14,s:'ok'},{n:'Veeam Backup',c:9,s:'ok'},
+    ],
+    sevData:[74,218,195,62,9],
+    cloudLabels:['Azure Health','AWS GovCloud','On-Prem EHR','Hybrid','SaaS Apps'],
+    cloudData:[180,95,210,120,30],
+    cloudColors:['#0ea5e9','#d97706','#4a5880','#065f46','#7c3aed'],
+    cloudChartTitle:'Alerts by Infrastructure',
+    toolChartTitle:'Alerts by Control (558 total)',
+    covColHdr:'AV Coverage',
+    regionTitle:'Facility Risk by Region',
+    regionBadge:'12 facilities',
+    postureTitle:'Clinical Security Posture',
+    feedBadge:'74 Critical',
+    toolStatusBadge:'20/20 Connected',
+    brandTitle:'Dark Web PHI Monitoring — DarkOwl / Recorded Future',
+    compliance:[
+      {name:'HIPAA',score:67,color:'#06b6d4'},
+      {name:'HITECH',score:62,color:'#f43f5e'},
+      {name:'ISO 27799',score:71,color:'#22d3a5'},
+      {name:'NIST CSF 2.0',score:68,color:'#a78bfa'},
+      {name:'CIS Controls v8',score:73,color:'#fbbf24'},
+      {name:'SOC 2 Type II',score:78,color:'#fb923c'},
+      {name:'NHS DSP Toolkit',score:64,color:'#06b6d4'},
+      {name:'GDPR',score:70,color:'#f43f5e'},
+    ],
+    alerts:[
+      {sev:'CRITICAL',tool:'Claroty',title:'Infusion pump lateral movement toward EMR server',time:'4m ago',region:'London'},
+      {sev:'CRITICAL',tool:'Varonis DLP',title:'22,000 patient records accessed outside care pathway',time:'12m ago',region:'Manchester'},
+      {sev:'CRITICAL',tool:'Armis',title:'Unmanaged cardiac monitor communicating on port 4444',time:'19m ago',region:'Leeds'},
+      {sev:'CRITICAL',tool:'SentinelOne',title:'BlackCat ransomware IOC match — radiology workstation',time:'28m ago',region:'Birmingham'},
+      {sev:'CRITICAL',tool:'Proofpoint',title:'Spear-phishing targeting senior nurses — credential harvest',time:'41m ago',region:'Edinburgh'},
+      {sev:'HIGH',tool:'Tenable.io',title:'CVE-2024-1234 on PACS imaging server — CVSS 9.1',time:'55m ago',region:'Glasgow'},
+      {sev:'HIGH',tool:'Imprivata IAM',title:'Shared account login: 4 simultaneous sessions — Dr. Account',time:'1.1h ago',region:'Dublin'},
+      {sev:'HIGH',tool:'Nozomi',title:'OT anomaly: infusion pump firmware tampering detected',time:'1.4h ago',region:'London'},
+      {sev:'HIGH',tool:'SentinelOne',title:'LSASS dump attempt — nurse workstation WS-NURSE-4421',time:'2h ago',region:'Leeds'},
+      {sev:'HIGH',tool:'Claroty',title:'MRI controller unauthorised network scan activity',time:'2.5h ago',region:'Manchester'},
+      {sev:'MEDIUM',tool:'Proofpoint',title:'Business email compromise attempt — CFO impersonation',time:'3h ago',region:'Birmingham'},
+      {sev:'MEDIUM',tool:'Qualys WAS',title:'Unencrypted patient portal login page detected',time:'3.5h ago',region:'Edinburgh'},
+    ],
+    threatActors:[
+      {name:'Hive Ransomware Group',conf:'HIGH',ttps:'Healthcare ransomware, PHI extortion',active:true},
+      {name:'BlackCat / ALPHV',conf:'HIGH',ttps:'Double extortion, medical device targeting',active:true},
+      {name:'Vice Society',conf:'MEDIUM',ttps:'Hospital attacks, data leak sites',active:false},
+    ],
+    brandAlerts:[
+      {sev:'CRITICAL',title:'PHI dataset from NHS Trust listed for sale on dark web marketplace',source:'DarkOwl',action:'Breach Assessment'},
+      {sev:'HIGH',title:'Doctor credential dumped in dark web forum — active phishing kit',source:'Recorded Future',action:'Password Reset'},
+      {sev:'HIGH',title:'Fake patient portal phishing site mimicking NHS login',source:'Recorded Future',action:'Takedown Filed'},
+      {sev:'MEDIUM',title:'Hospital brand referenced in ransomware group Telegram channel',source:'DarkOwl',action:'Monitoring'},
+    ],
+    iocs:[
+      {type:'Ransomware Hashes',count:38,icon:'🦠'},
+      {type:'C2 IPs',count:19,icon:'🌐'},
+      {type:'Malicious Domains',count:14,icon:'🔗'},
+      {type:'PHI Leak URLs',count:9,icon:'🏥'},
+    ],
+    execSummary:`The healthcare estate is operating at a clinical security posture of 56/100 following detection of a suspected ransomware pre-cursor attack originating from unmanaged medical devices. Claroty and Armis have identified lateral movement from infusion pumps and a cardiac monitor toward the EMR and PACS servers — consistent with Hive and BlackCat ransomware TTPs targeting healthcare in 2025–2026.
+<br><br>Patient safety and data risk are the immediate priorities. 22,000 patient records have been accessed outside normal care pathways (Varonis DLP), and a PHI dataset is reportedly available for sale on a dark web marketplace (DarkOwl). HIPAA and NHS DSP Toolkit compliance scores are below acceptable thresholds at 67% and 64% respectively.
+<br><br>Recommended actions: (1) Immediately network-isolate the affected medical device segment, (2) Activate the clinical continuity plan and switch EMR to offline mode, (3) Notify the ICO/NHS England within the 72-hour GDPR window, (4) Emergency patching of PACS CVE-2024-1234, (5) Engage forensics retainer. MTTD of 22 minutes must be reduced to under 10 for clinical environments.`,
+    assetTotal:'12,800', assetEDR:'83.4%', assetVMDR:'79.1%', assetGaps:'2,134',
+    assetEDRLabel:'AV / EDR Coverage', assetVMDRLabel:'Vulnerability Scanned',
+    regionData:[
+      {code:'LDN',name:'London (HQ)',risk:'HIGH',critical:3,high:12,medium:22,cov:88.4,assets:2800},
+      {code:'MCR',name:'Manchester',risk:'CRITICAL',critical:5,high:18,medium:28,cov:72.1,assets:2100},
+      {code:'BHM',name:'Birmingham',risk:'HIGH',critical:2,high:9,medium:19,cov:81.3,assets:1900},
+      {code:'LDS',name:'Leeds',risk:'HIGH',critical:4,high:14,medium:16,cov:76.8,assets:1700},
+      {code:'EDI',name:'Edinburgh',risk:'MEDIUM',critical:1,high:6,medium:12,cov:86.5,assets:1400},
+      {code:'GLA',name:'Glasgow',risk:'LOW',critical:0,high:4,medium:10,cov:90.2,assets:1100},
+      {code:'DUB',name:'Dublin',risk:'MEDIUM',critical:1,high:7,medium:14,cov:84.7,assets:900},
+      {code:'LPL',name:'Liverpool',risk:'LOW',critical:0,high:3,medium:8,cov:91.0,assets:800},
+    ],
+    mitre:[
+      {t:'Initial Access',c:71,col:'#991b1b'},{t:'Execution',c:38,col:'#b45309'},
+      {t:'Persistence',c:29,col:'#b45309'},{t:'Priv. Escalation',c:41,col:'#991b1b'},
+      {t:'Defense Evasion',c:24,col:'#1e3a5f'},{t:'Cred. Access',c:55,col:'#991b1b'},
+      {t:'Discovery',c:18,col:'#1e3a5f'},{t:'Lateral Movement',c:62,col:'#991b1b'},
+      {t:'Collection',c:44,col:'#b45309'},{t:'C2',c:49,col:'#991b1b'},
+      {t:'Exfil.',c:28,col:'#b45309'},{t:'Impact',c:35,col:'#b45309'},
+    ],
+    postureTrend:[71,69,72,70,67,64,61,58,55,57,59,60,62,61,59,57,56,58,57,56,57,55,56,57,58,56,55,57,56,56],
+  },
+
+  financial: {
+    label:'Financial Services Security · Global Banking & Insurance',
+    icon:'🏦',
+    accent:'#10b981',
+    accentBtn:'#064e3b',
+    posture:62,
+    postureGrade:'B- — Regulatory Exposure',
+    postureGradeColor:'#fbbf24',
+    postureGradeBg:'var(--yellow-bg)',
+    ringColor:'#10b981',
+    critCount:88, highCount:241, incidents:6, mttd:'11.4m',
+    attackPct:68, attackVector:'BEC / Fraud', attackSecondary:'Insider Threat',
+    attackActor:'FIN7 / Carbanak', attackConfidence:'HIGH',
+    attackSources:'Defender + Tanium + NICE Actimize',
+    banner:'HIGH ALERT — BEC Campaign Targeting Treasury Payments',
+    bannerDesc:'Defender for O365 + NICE Actimize detect coordinated CEO/CFO impersonation targeting 11 payment authorisers. FIN7 TTPs confirmed. Potential exposure: $4.2M.',
+    bannerBtn:'Freeze Payments',
+    domains:[
+      {name:'Endpoint',score:68.4,color:'#10b981'},
+      {name:'Cloud',score:65.1,color:'#4f8bff'},
+      {name:'Identity',score:71.2,color:'#a78bfa'},
+      {name:'Email / BEC',score:54.8,color:'#f43f5e'},
+      {name:'Fraud/TXN',score:60.3,color:'#fbbf24'},
+      {name:'Insider',score:58.7,color:'#fb923c'},
+    ],
+    tools:[
+      {n:'CrowdStrike EDR',c:88,s:'ok'},{n:'Defender O365',c:74,s:'ok'},
+      {n:'Qualys VMDR',c:65,s:'ok'},{n:'Palo Alto XSIAM',c:55,s:'ok'},
+      {n:'NICE Actimize',c:48,s:'ok'},{n:'Varonis DLP',c:40,s:'ok'},
+      {n:'Splunk SOAR',c:33,s:'ok'},{n:'CyberArk PAM',c:38,s:'ok'},
+      {n:'Tanium',c:28,s:'ok'},{n:'Zscaler SASE',c:42,s:'ok'},
+      {n:'Akamai WAF',c:51,s:'ok'},{n:'Darktrace',c:34,s:'ok'},
+      {n:'Recorded Future',c:22,s:'ok'},{n:'Digital Shadows',c:19,s:'ok'},
+      {n:'Securonix UEBA',c:30,s:'ok'},{n:'F5 APM',c:24,s:'ok'},
+      {n:'IBM Guardium',c:15,s:'warn'},{n:'Checkmarx SAST',c:11,s:'ok'},
+      {n:'OneTrust Privacy',c:8,s:'ok'},{n:'Rubrik Backup',c:7,s:'ok'},
+    ],
+    sevData:[88,241,188,44,8],
+    cloudLabels:['Azure (Primary)','AWS (DR)','GCP (Analytics)','On-Prem Core','SaaS'],
+    cloudData:[280,155,90,185,45],
+    cloudColors:['#1e40af','#d97706','#065f46','#4a5880','#7c3aed'],
+    cloudChartTitle:'Alerts by Platform',
+    toolChartTitle:'Alerts by Control (569 total)',
+    covColHdr:'EDR Coverage',
+    regionTitle:'Global Risk by Financial Centre',
+    regionBadge:'12 offices',
+    postureTitle:'Financial Security Posture',
+    feedBadge:'88 Critical',
+    toolStatusBadge:'20/20 Connected',
+    brandTitle:'Fraud & Brand Intelligence — Digital Shadows / Recorded Future',
+    compliance:[
+      {name:'PCI DSS v4.0',score:79,color:'#10b981'},
+      {name:'SOX IT Controls',score:74,color:'#4f8bff'},
+      {name:'DORA (EU)',score:61,color:'#f43f5e'},
+      {name:'GDPR',score:69,color:'#a78bfa'},
+      {name:'MAS TRM (SG)',score:72,color:'#fbbf24'},
+      {name:'CBUAE IT Risk',score:65,color:'#fb923c'},
+      {name:'ISO 27001:2022',score:76,color:'#22d3a5'},
+      {name:'NIST CSF 2.0',score:70,color:'#06b6d4'},
+    ],
+    alerts:[
+      {sev:'CRITICAL',tool:'NICE Actimize',title:'$4.2M SWIFT transfer to new beneficiary — fraud score 98',time:'3m ago',region:'LDN'},
+      {sev:'CRITICAL',tool:'Defender O365',title:'CFO email account compromise — forwarding rule created',time:'9m ago',region:'NYC'},
+      {sev:'CRITICAL',tool:'Securonix UEBA',title:'Insider: analyst exporting 50k client records at 02:00',time:'17m ago',region:'DXB'},
+      {sev:'CRITICAL',tool:'CrowdStrike',title:'FIN7 Carbanak implant detected — trading desk host',time:'25m ago',region:'HKG'},
+      {sev:'CRITICAL',tool:'Varonis DLP',title:'Trade secrets transferred to personal cloud storage',time:'38m ago',region:'NYC'},
+      {sev:'CRITICAL',tool:'Palo Alto XSIAM',title:'ATM network lateral movement from compromised branch PC',time:'50m ago',region:'SGP'},
+      {sev:'HIGH',tool:'Qualys',title:'Critical CVE on internet-facing core banking middleware',time:'1h ago',region:'LDN'},
+      {sev:'HIGH',tool:'Digital Shadows',title:'Client login credentials sold on dark web — 8,200 records',time:'1.3h ago',region:'ALL'},
+      {sev:'HIGH',tool:'CyberArk',title:'Treasury admin account login from Tor exit node',time:'1.8h ago',region:'DXB'},
+      {sev:'HIGH',tool:'Akamai WAF',title:'Credential stuffing: 12,000 login attempts in 5 min',time:'2.2h ago',region:'NYC'},
+      {sev:'MEDIUM',tool:'IBM Guardium',title:'Unusual DB query pattern — 80k rows read by single user',time:'2.8h ago',region:'SGP'},
+      {sev:'MEDIUM',tool:'Defender O365',title:'Bulk email exfiltration via Outlook rule to external domain',time:'3.4h ago',region:'LDN'},
+    ],
+    threatActors:[
+      {name:'FIN7 / Carbanak',conf:'HIGH',ttps:'Banking trojans, SWIFT fraud, POS malware',active:true},
+      {name:'Lazarus Group (DPRK)',conf:'HIGH',ttps:'Crypto theft, SWIFT targeting, insider recruitment',active:true},
+      {name:'Evil Corp / TA505',conf:'MEDIUM',ttps:'BEC, payroll fraud, ransomware',active:false},
+    ],
+    brandAlerts:[
+      {sev:'CRITICAL',title:'8,200 client login credentials listed on dark web marketplace',source:'Digital Shadows',action:'Client Notification'},
+      {sev:'HIGH',title:'Fake mobile banking app impersonating brand — 4 app stores',source:'Recorded Future',action:'Takedown Initiated'},
+      {sev:'HIGH',title:'Phishing kit targeting online banking — active since 6h ago',source:'Recorded Future',action:'Takedown Filed'},
+      {sev:'MEDIUM',title:'Competitor referencing internal HR policy — possible insider leak',source:'Digital Shadows',action:'HR Investigation'},
+    ],
+    iocs:[
+      {type:'Fraud IPs',count:62,icon:'💳'},
+      {type:'Malicious Domains',count:31,icon:'🔗'},
+      {type:'Malware Hashes',count:77,icon:'#️⃣'},
+      {type:'BEC Domains',count:44,icon:'📧'},
+    ],
+    execSummary:`The financial services estate is at 62/100 posture, with a BEC campaign actively targeting treasury payment authorisers constituting the most time-critical risk. NICE Actimize has flagged a $4.2M SWIFT transfer with a fraud score of 98, while Defender for O365 confirms the CFO email account has been compromised with a forwarding rule exfiltrating correspondence. FIN7/Carbanak indicators have also been detected on a trading desk host in Hong Kong.
+<br><br>Regulatory exposure is elevated across DORA (61%) and CBUAE IT Risk (65%), both of which are below the 70% board-approved threshold. An insider threat event in Dubai — an analyst exporting 50k client records at 02:00 — is under investigation. IBM Guardium and Securonix UEBA flagged the activity but the initial alert response took 48 minutes, breaching the 20-minute SLA.
+<br><br>Immediate actions: (1) Freeze the flagged SWIFT transaction and revoke CFO session tokens, (2) Isolate the Carbanak-compromised trading terminal, (3) Notify CBUAE/FCA under 72-hour breach obligation, (4) Engage fraud operations team to notify the 8,200 affected clients, (5) Initiate insider investigation with Legal and HR.`,
+    assetTotal:'31,400', assetEDR:'94.1%', assetVMDR:'91.3%', assetGaps:'1,853',
+    assetEDRLabel:'EDR (CrowdStrike)', assetVMDRLabel:'VMDR (Qualys)',
+    regionData:[
+      {code:'LDN',name:'London',risk:'HIGH',critical:4,high:14,medium:20,cov:95.2,assets:7200},
+      {code:'NYC',name:'New York',risk:'CRITICAL',critical:6,high:20,medium:24,cov:91.8,assets:8800},
+      {code:'DXB',name:'Dubai',risk:'HIGH',critical:3,high:11,medium:18,cov:87.4,assets:4100},
+      {code:'HKG',name:'Hong Kong',risk:'CRITICAL',critical:5,high:16,medium:21,cov:89.3,assets:5300},
+      {code:'SGP',name:'Singapore',risk:'HIGH',critical:2,high:9,medium:15,cov:93.6,assets:3200},
+      {code:'FRA',name:'Frankfurt',risk:'MEDIUM',critical:1,high:6,medium:12,cov:96.1,assets:2900},
+      {code:'ZRH',name:'Zurich',risk:'LOW',critical:0,high:4,medium:9,cov:97.4,assets:1800},
+      {code:'TYO',name:'Tokyo',risk:'MEDIUM',critical:1,high:7,medium:11,cov:92.8,assets:2400},
+    ],
+    mitre:[
+      {t:'Initial Access',c:78,col:'#991b1b'},{t:'Execution',c:42,col:'#b45309'},
+      {t:'Persistence',c:35,col:'#b45309'},{t:'Priv. Escalation',c:44,col:'#991b1b'},
+      {t:'Defense Evasion',c:28,col:'#1e3a5f'},{t:'Cred. Access',c:61,col:'#991b1b'},
+      {t:'Discovery',c:19,col:'#1e3a5f'},{t:'Lateral Movement',c:37,col:'#b45309'},
+      {t:'Collection',c:52,col:'#991b1b'},{t:'C2',c:44,col:'#b45309'},
+      {t:'Exfil.',c:48,col:'#991b1b'},{t:'Impact',c:29,col:'#b45309'},
+    ],
+    postureTrend:[74,72,75,73,70,68,65,63,61,62,63,64,65,63,61,62,64,63,62,61,62,63,62,61,63,62,61,62,62,62],
+  },
+
+  energy: {
+    label:'Oil & Gas / Energy · OT/ICS Security',
+    icon:'⚡',
+    accent:'#f59e0b',
+    accentBtn:'#78350f',
+    posture:44,
+    postureGrade:'D — Critical Infrastructure at Risk',
+    postureGradeColor:'var(--red)',
+    postureGradeBg:'var(--red-bg)',
+    ringColor:'#f59e0b',
+    critCount:97, highCount:189, incidents:11, mttd:'38.2m',
+    attackPct:89, attackVector:'OT / ICS Sabotage', attackSecondary:'Spear Phishing Ops',
+    attackActor:'Sandworm / TEMP.Veles', attackConfidence:'HIGH',
+    attackSources:'Dragos + Claroty + Tenable OT',
+    banner:'CRITICAL — ICS/OT Network Intrusion Detected · Safety Systems at Risk',
+    bannerDesc:'Dragos detected TRITON/TRISIS variant attempting to disable safety instrumented systems (SIS). Sandworm TTPs confirmed. Potential physical safety impact.',
+    bannerBtn:'Emergency Shutdown',
+    domains:[
+      {name:'IT Endpoint',score:52.1,color:'#f59e0b'},
+      {name:'OT / ICS',score:31.8,color:'#f43f5e'},
+      {name:'SCADA',score:38.4,color:'#f43f5e'},
+      {name:'Identity',score:49.6,color:'#a78bfa'},
+      {name:'Network',score:44.2,color:'#22d3a5'},
+      {name:'Phys. Sec.',score:58.7,color:'#22d3a5'},
+    ],
+    tools:[
+      {n:'CrowdStrike EDR',c:65,s:'ok'},{n:'Dragos Platform',c:97,s:'ok'},
+      {n:'Claroty OT',c:82,s:'ok'},{n:'Tenable OT',c:71,s:'ok'},
+      {n:'Proofpoint Email',c:44,s:'ok'},{n:'Palo Alto ICS FW',c:58,s:'ok'},
+      {n:'Nozomi Networks',c:69,s:'ok'},{n:'CyberArk PAM',c:33,s:'ok'},
+      {n:'Zscaler SASE',c:28,s:'ok'},{n:'Veeam Backup',c:19,s:'ok'},
+      {n:'Recorded Future',c:22,s:'ok'},{n:'IronNet NDR',c:31,s:'ok'},
+      {n:'Microsoft Entra',c:26,s:'ok'},{n:'Splunk SIEM',c:38,s:'warn'},
+      {n:'Fortinet NGFW',c:44,s:'ok'},{n:'Indegy OT',c:17,s:'ok'},
+      {n:'Checkpoint FW',c:29,s:'ok'},{n:'Asset Panda',c:8,s:'ok'},
+      {n:'Radiflow',c:14,s:'ok'},{n:'Axonius',c:9,s:'ok'},
+    ],
+    sevData:[97,189,165,38,7],
+    cloudLabels:['On-Prem OT','Azure (IT)','AWS (DR)','Hybrid SCADA','Satellite'],
+    cloudData:[320,120,80,155,25],
+    cloudColors:['#4a5880','#1e40af','#d97706','#065f46','#7c3aed'],
+    cloudChartTitle:'Alerts by Network Segment',
+    toolChartTitle:'Alerts by Control (496 total)',
+    covColHdr:'AV / OT Coverage',
+    regionTitle:'Facility Risk by Site',
+    regionBadge:'12 sites',
+    postureTitle:'OT/IT Security Posture',
+    feedBadge:'97 Critical',
+    toolStatusBadge:'20/20 Connected',
+    brandTitle:'Threat Intel — Dragos WorldView / Recorded Future',
+    compliance:[
+      {name:'IEC 62443',score:52,color:'#f59e0b'},
+      {name:'NERC CIP',score:64,color:'#4f8bff'},
+      {name:'NIST SP 800-82',score:57,color:'#22d3a5'},
+      {name:'ISO 27001',score:69,color:'#a78bfa'},
+      {name:'TSA Pipeline Dir.',score:61,color:'#fbbf24'},
+      {name:'NIS2 Directive',score:55,color:'#fb923c'},
+      {name:'IAEA CyberSec',score:49,color:'#f43f5e'},
+      {name:'CIS Controls v8',score:63,color:'#22d3a5'},
+    ],
+    alerts:[
+      {sev:'CRITICAL',tool:'Dragos',title:'TRITON variant attempting SIS controller reprogramming',time:'6m ago',region:'Jubail Plant'},
+      {sev:'CRITICAL',tool:'Claroty',title:'Unauthorized PLC firmware modification — Gas Compressor 3',time:'14m ago',region:'Abqaiq'},
+      {sev:'CRITICAL',tool:'Nozomi',title:'Engineering workstation communicating with Sandworm C2 IP',time:'22m ago',region:'Jubail Plant'},
+      {sev:'CRITICAL',tool:'Dragos',title:'HMI anomaly: safety setpoints altered on pressure relief valve',time:'31m ago',region:'Ras Tanura'},
+      {sev:'CRITICAL',tool:'Proofpoint',title:'Spear-phish to OT engineer — weaponised PDF with ICS payload',time:'45m ago',region:'Yanbu'},
+      {sev:'CRITICAL',tool:'Tenable OT',title:'Unpatched Modbus vulnerability exploited on SCADA server',time:'58m ago',region:'Abqaiq'},
+      {sev:'HIGH',tool:'Palo Alto ICS FW',title:'IT-OT boundary: jump server accessed from unrecognised IP',time:'1.2h ago',region:'All Sites'},
+      {sev:'HIGH',tool:'CyberArk',title:'Privileged OT operator account used from offsite location',time:'1.6h ago',region:'Ras Tanura'},
+      {sev:'HIGH',tool:'Recorded Future',title:'Dragos WorldView: new ICS-targeted zero-day in SCADA platform',time:'2h ago',region:'Global'},
+      {sev:'HIGH',tool:'IronNet NDR',title:'Anomalous modbus traffic between historian and DCS controller',time:'2.5h ago',region:'Jubail Plant'},
+      {sev:'MEDIUM',tool:'Splunk SIEM',title:'Repeated remote desktop failures to engineering server',time:'3.1h ago',region:'Yanbu'},
+      {sev:'MEDIUM',tool:'CrowdStrike',title:'Suspicious scripting on IT-side OT support workstation',time:'3.8h ago',region:'Abqaiq'},
+    ],
+    threatActors:[
+      {name:'Sandworm (GRU Unit 74455)',conf:'HIGH',ttps:'TRITON/TRISIS, CRASHOVERRIDE, critical infra sabotage',active:true},
+      {name:'TEMP.Veles',conf:'HIGH',ttps:'ICS-specific intrusion, SIS targeting',active:true},
+      {name:'Volt Typhoon (China)',conf:'MEDIUM',ttps:'Pre-positioning in energy grid, living-off-the-land',active:false},
+    ],
+    brandAlerts:[
+      {sev:'CRITICAL',title:'Dragos WorldView: new zero-day targeting vendor\'s SCADA DCS platform',source:'Dragos WorldView',action:'Emergency Patch'},
+      {sev:'HIGH',title:'Threat actor forum discussing company pipeline control system architecture',source:'Recorded Future',action:'OSINT Review'},
+      {sev:'HIGH',title:'OT engineer LinkedIn data scraped — spear-phish campaign expected',source:'Recorded Future',action:'Staff Alert'},
+      {sev:'MEDIUM',title:'Competitor energy firm experienced similar ICS intrusion — sharing IOCs',source:'FS-ISAC / E-ISAC',action:'IOC Ingested'},
+    ],
+    iocs:[
+      {type:'OT Malware Hashes',count:29,icon:'⚙️'},
+      {type:'C2 IPs (ICS)',count:18,icon:'🌐'},
+      {type:'Phishing Domains',count:12,icon:'🔗'},
+      {type:'Recon Indicators',count:41,icon:'🔍'},
+    ],
+    execSummary:`The OT/ICS security posture is at a critical 44/100 — the lowest recorded in 18 months — following confirmed Sandworm activity targeting safety instrumented systems at Jubail and Ras Tanura facilities. Dragos has detected a TRITON/TRISIS variant attempting to reprogram SIS controllers, and Claroty confirms unauthorized PLC firmware modification on Gas Compressor 3. These events have direct potential for physical harm and process safety impact.
+<br><br>The IT/OT boundary remains the most exploitable vector: the jump server was accessed from an unrecognised external IP, and an OT engineering workstation was observed communicating with a confirmed Sandworm C2 address. IEC 62443 compliance is critically low at 52%, and MTTD of 38 minutes is unacceptable for a safety-critical environment where seconds matter.
+<br><br>Immediate actions: (1) Activate emergency process shutdown procedures at Jubail and Ras Tanura per ICS incident response plan, (2) Isolate all affected PLC and SIS segments from the corporate network, (3) Notify ICS-CERT, NSA CISA, and Saudi NCSC within 1 hour, (4) Deploy Dragos threat hunting team on-site, (5) Conduct emergency firmware integrity check on all compressor PLCs before resuming operations.`,
+    assetTotal:'8,940', assetEDR:'72.8%', assetVMDR:'68.4%', assetGaps:'2,424',
+    assetEDRLabel:'AV / EDR Coverage', assetVMDRLabel:'OT Asset Scanned',
+    regionData:[
+      {code:'JBL',name:'Jubail Plant',risk:'CRITICAL',critical:8,high:22,medium:18,cov:65.2,assets:1200},
+      {code:'ABQ',name:'Abqaiq',risk:'CRITICAL',critical:7,high:18,medium:21,cov:68.4,assets:980},
+      {code:'RTN',name:'Ras Tanura',risk:'CRITICAL',critical:6,high:16,medium:19,cov:70.1,assets:1100},
+      {code:'YNB',name:'Yanbu',risk:'HIGH',critical:3,high:12,medium:14,cov:74.8,assets:840},
+      {code:'RYD',name:'Riyadh (HQ)',risk:'HIGH',critical:2,high:9,medium:16,cov:81.3,assets:1400},
+      {code:'DXB',name:'Dubai Office',risk:'MEDIUM',critical:1,high:6,medium:11,cov:87.4,assets:620},
+      {code:'LON',name:'London Office',risk:'LOW',critical:0,high:4,medium:8,cov:91.2,assets:480},
+      {code:'HOU',name:'Houston',risk:'MEDIUM',critical:1,high:7,medium:12,cov:84.6,assets:540},
+    ],
+    mitre:[
+      {t:'Initial Access',c:82,col:'#991b1b'},{t:'Execution',c:49,col:'#b45309'},
+      {t:'Persistence',c:44,col:'#b45309'},{t:'Priv. Escalation',c:38,col:'#b45309'},
+      {t:'Defense Evasion',c:22,col:'#1e3a5f'},{t:'Cred. Access',c:51,col:'#991b1b'},
+      {t:'Discovery',c:35,col:'#b45309'},{t:'Lateral Movement',c:47,col:'#991b1b'},
+      {t:'Collection',c:29,col:'#1e3a5f'},{t:'C2',c:61,col:'#991b1b'},
+      {t:'Inhibit ICS',c:78,col:'#991b1b'},{t:'Impact',c:44,col:'#b45309'},
+    ],
+    postureTrend:[55,53,56,52,49,47,45,43,41,42,43,44,46,45,43,42,44,43,42,41,42,44,43,44,45,43,44,44,44,44],
+  },
+
+  retail: {
+    label:'Retail & E-Commerce Security · Global POS & Digital Commerce',
+    icon:'🛒',
+    accent:'#ec4899',
+    accentBtn:'#831843',
+    posture:58,
+    postureGrade:'C+ — Cardholder Data Risk',
+    postureGradeColor:'#fb923c',
+    postureGradeBg:'var(--orange-bg)',
+    ringColor:'#ec4899',
+    critCount:83, highCount:224, incidents:7, mttd:'18.9m',
+    attackPct:74, attackVector:'Card Skimming / POS', attackSecondary:'Magecart / E-Skimming',
+    attackActor:'Carbanak / Fin6', attackConfidence:'HIGH',
+    attackSources:'Sysdig + Recorded Future + PCI DSS Scanner',
+    banner:'HIGH ALERT — Magecart E-Skimming Script Detected on Checkout Pages',
+    bannerDesc:'Sysdig and Recorded Future confirm JavaScript skimmer injected across 3 regional checkout endpoints. FIN6 attribution. Potential CHD exposure: 180,000 transactions.',
+    bannerBtn:'Pull Checkout Pages',
+    domains:[
+      {name:'E-Commerce',score:52.4,color:'#ec4899'},
+      {name:'POS Systems',score:55.1,color:'#f43f5e'},
+      {name:'Cloud Infra',score:63.8,color:'#4f8bff'},
+      {name:'Identity',score:61.2,color:'#a78bfa'},
+      {name:'Supply Chain',score:56.4,color:'#fbbf24'},
+      {name:'DLP / CHD',score:57.9,color:'#fb923c'},
+    ],
+    tools:[
+      {n:'CrowdStrike EDR',c:83,s:'ok'},{n:'Proofpoint Email',c:62,s:'ok'},
+      {n:'Qualys VMDR',c:58,s:'ok'},{n:'Sysdig CSPM',c:55,s:'ok'},
+      {n:'Symantec DLP',c:45,s:'ok'},{n:'Recorded Future',c:28,s:'ok'},
+      {n:'Noname API Sec.',c:38,s:'ok'},{n:'Imperva WAF',c:52,s:'ok'},
+      {n:'Forter Fraud',c:44,s:'ok'},{n:'Cloudflare CDN',c:61,s:'ok'},
+      {n:'Ping Identity',c:31,s:'ok'},{n:'Akamai Bot Mgmt',c:48,s:'ok'},
+      {n:'Contrast IAST',c:22,s:'ok'},{n:'PCI Compliance',c:19,s:'warn'},
+      {n:'Splunk SIEM',c:35,s:'ok'},{n:'Palo Alto NGFW',c:40,s:'ok'},
+      {n:'Axonius Assets',c:14,s:'ok'},{n:'Netskope CASB',c:27,s:'ok'},
+      {n:'Darktrace',c:18,s:'ok'},{n:'Commvault',c:9,s:'ok'},
+    ],
+    sevData:[83,224,201,52,10],
+    cloudLabels:['AWS (Primary)','Azure (EU)','GCP (APAC)','On-Prem POS','CDN Edge'],
+    cloudData:[260,180,115,155,55],
+    cloudColors:['#d97706','#1e40af','#065f46','#4a5880','#7c3aed'],
+    cloudChartTitle:'Alerts by Platform',
+    toolChartTitle:'Alerts by Control (570 total)',
+    covColHdr:'EDR Coverage',
+    regionTitle:'Risk by Retail Region',
+    regionBadge:'12 regions',
+    postureTitle:'Retail Security Posture',
+    feedBadge:'83 Critical',
+    toolStatusBadge:'20/20 Connected',
+    brandTitle:'Brand & Fraud Intelligence — Recorded Future / Forter',
+    compliance:[
+      {name:'PCI DSS v4.0',score:63,color:'#ec4899'},
+      {name:'GDPR',score:68,color:'#f43f5e'},
+      {name:'CCPA (California)',score:72,color:'#4f8bff'},
+      {name:'ISO 27001',score:70,color:'#a78bfa'},
+      {name:'SOC 2 Type II',score:76,color:'#fbbf24'},
+      {name:'NIST CSF 2.0',score:67,color:'#fb923c'},
+      {name:'DIFC PDPL',score:61,color:'#22d3a5'},
+      {name:'CIS Controls v8',score:72,color:'#06b6d4'},
+    ],
+    alerts:[
+      {sev:'CRITICAL',tool:'Sysdig',title:'Magecart skimmer script injected into checkout page JS',time:'7m ago',region:'EU Store'},
+      {sev:'CRITICAL',tool:'Recorded Future',title:'CHD dump: 180k transaction records indexed on dark web',time:'18m ago',region:'Global'},
+      {sev:'CRITICAL',tool:'Forter Fraud',title:'Account takeover wave: 4,200 accounts compromised in 2h',time:'29m ago',region:'US'},
+      {sev:'CRITICAL',tool:'Imperva WAF',title:'SQL injection attack on product search — blind SQLi confirmed',time:'38m ago',region:'APAC'},
+      {sev:'CRITICAL',tool:'CrowdStrike',title:'FIN6 Carbanak variant on POS terminal — Store #441',time:'52m ago',region:'UAE'},
+      {sev:'CRITICAL',tool:'Qualys',title:'Unpatched Apache Struts on e-commerce server — CVSS 10.0',time:'1h ago',region:'US'},
+      {sev:'HIGH',tool:'Noname API',title:'Broken authentication on /api/v2/cart endpoint exploited',time:'1.2h ago',region:'EU'},
+      {sev:'HIGH',tool:'Akamai Bot',title:'Bot scraping attack: 280k product price requests in 1h',time:'1.5h ago',region:'Global'},
+      {sev:'HIGH',tool:'Symantec DLP',title:'Customer PII in S3 bucket with public-read ACL',time:'2h ago',region:'US'},
+      {sev:'HIGH',tool:'Forter Fraud',title:'Payment fraud velocity: 120 transactions $999 each — 10 min',time:'2.4h ago',region:'AU'},
+      {sev:'MEDIUM',tool:'Sysdig',title:'Container breakout attempt in payment processing pod',time:'3h ago',region:'AWS'},
+      {sev:'MEDIUM',tool:'Ping Identity',title:'MFA fatigue attack on store manager accounts — 88 attempts',time:'3.6h ago',region:'UK'},
+    ],
+    threatActors:[
+      {name:'FIN6 / Carbanak',conf:'HIGH',ttps:'POS malware, Magecart, card skimming',active:true},
+      {name:'Magecart Groups',conf:'HIGH',ttps:'E-skimming, JavaScript supply chain injection',active:true},
+      {name:'REvil / Sodinokibi',conf:'MEDIUM',ttps:'Ransomware targeting retail over holiday periods',active:false},
+    ],
+    brandAlerts:[
+      {sev:'CRITICAL',title:'180k cardholder records indexed on carding forum — FIN6 confirmed',source:'Recorded Future',action:'PCI Notification'},
+      {sev:'HIGH',title:'Fake retailer website cloning brand — 22k visits in 48h',source:'Recorded Future',action:'Takedown Requested'},
+      {sev:'HIGH',title:'Malicious Chrome extension stealing loyalty card tokens',source:'Recorded Future',action:'User Advisory'},
+      {sev:'MEDIUM',title:'Discount voucher fraud scheme targeting loyalty programme',source:'Forter',action:'Voucher Freeze'},
+    ],
+    iocs:[
+      {type:'Skimmer Hashes',count:22,icon:'💳'},
+      {type:'Fraud IPs',count:58,icon:'🌐'},
+      {type:'Phishing Domains',count:34,icon:'🔗'},
+      {type:'Bot ASNs',count:19,icon:'🤖'},
+    ],
+    execSummary:`The retail security posture is at 58/100, with an active Magecart e-skimming campaign representing the most urgent threat. Sysdig has confirmed a JavaScript skimmer injected across three regional checkout endpoints, with Recorded Future reporting that 180,000 cardholder records are already indexed on dark web carding forums — indicating data loss has occurred. FIN6 attribution is high-confidence based on the Carbanak toolset detected on POS terminal #441 in the UAE.
+<br><br>PCI DSS v4.0 compliance is critically low at 63%, below the 75% minimum required for merchant tier 1 status. Four account takeover events (4,200 accounts) and a payment fraud velocity attack ($120k within 10 minutes) are in progress simultaneously. The Imperva WAF blocked a confirmed blind SQL injection, but the Qualys finding of an unpatched Apache Struts server (CVSS 10.0) in the e-commerce stack represents a systemic exposure.
+<br><br>Immediate actions: (1) Pull affected checkout pages offline and serve static confirmation, (2) Engage Visa/Mastercard under PCI DSS Requirement 12.10.5 breach notification, (3) Patch Apache Struts instance within 2 hours, (4) Freeze all loyalty accounts pending ATO investigation, (5) Notify GDPR/CCPA supervisory authorities within 72 hours.`,
+    assetTotal:'22,600', assetEDR:'87.2%', assetVMDR:'84.5%', assetGaps:'2,896',
+    assetEDRLabel:'EDR (CrowdStrike)', assetVMDRLabel:'VMDR (Qualys)',
+    regionData:[
+      {code:'US',name:'North America',risk:'CRITICAL',critical:5,high:18,medium:24,cov:89.4,assets:5200},
+      {code:'EU',name:'Europe',risk:'HIGH',critical:3,high:14,medium:20,cov:87.1,assets:4800},
+      {code:'AE',name:'UAE / Gulf',risk:'HIGH',critical:4,high:16,medium:22,cov:82.3,assets:2900},
+      {code:'AU',name:'Australia',risk:'MEDIUM',critical:1,high:8,medium:14,cov:91.2,assets:1900},
+      {code:'SG',name:'Singapore',risk:'MEDIUM',critical:1,high:7,medium:13,cov:88.6,assets:1700},
+      {code:'UK',name:'United Kingdom',risk:'HIGH',critical:2,high:11,medium:18,cov:85.4,assets:2400},
+      {code:'IN',name:'India',risk:'LOW',critical:0,high:5,medium:10,cov:84.7,assets:2100},
+      {code:'CN',name:'China (Limited)',risk:'MEDIUM',critical:1,high:6,medium:12,cov:78.9,assets:1600},
+    ],
+    mitre:[
+      {t:'Initial Access',c:75,col:'#991b1b'},{t:'Execution',c:41,col:'#b45309'},
+      {t:'Persistence',c:33,col:'#b45309'},{t:'Priv. Escalation',c:39,col:'#b45309'},
+      {t:'Defense Evasion',c:27,col:'#1e3a5f'},{t:'Cred. Access',c:58,col:'#991b1b'},
+      {t:'Discovery',c:21,col:'#1e3a5f'},{t:'Lateral Movement',c:34,col:'#b45309'},
+      {t:'Collection',c:62,col:'#991b1b'},{t:'C2',c:41,col:'#b45309'},
+      {t:'Exfil.',c:55,col:'#991b1b'},{t:'Impact',c:24,col:'#1e3a5f'},
+    ],
+    postureTrend:[66,64,67,65,62,60,58,57,56,57,58,59,60,59,57,58,59,58,57,58,59,58,57,58,59,58,57,58,58,58],
+  },
+
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let currentVertical = 'enterprise';
+let chartInstances = {};
+
+// ============================================================
+// HELPERS
+// ============================================================
+const sevClass = s => ({CRITICAL:'sev-critical',HIGH:'sev-high',MEDIUM:'sev-medium',LOW:'sev-low',INFO:'sev-low'}[s]||'sev-low');
+const sevBorder = s => ({CRITICAL:'var(--red)',HIGH:'var(--orange)',MEDIUM:'var(--yellow)',LOW:'var(--green)',INFO:'var(--green)'}[s]||'var(--green)');
+const riskClass = r => ({CRITICAL:'risk-critical',HIGH:'risk-high',MEDIUM:'risk-medium',LOW:'risk-low'}[r]||'risk-low');
+
+function destroyChart(id) {
+  if (chartInstances[id]) { try { chartInstances[id].destroy(); } catch(e){} delete chartInstances[id]; }
+}
+
+function scoreColor(s) {
+  if (s >= 75) return 'var(--green)';
+  if (s >= 60) return 'var(--yellow)';
+  if (s >= 45) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+// ============================================================
+// SWITCH VERTICAL
+// ============================================================
+function switchVertical(key, btn) {
+  currentVertical = key;
+  const v = VERTICALS[key];
+
+  // Update button styles
+  document.querySelectorAll('.v-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.background = '';
+    b.style.color = '';
+  });
+  btn.classList.add('active');
+  btn.style.background = v.accent;
+  btn.style.color = '#fff';
+
+  // Update CSS accent
+  document.documentElement.style.setProperty('--v-accent', v.accent);
+
+  // Update brand
+  document.getElementById('brand-icon').textContent = v.icon;
+  document.getElementById('brand-icon').style.background = `linear-gradient(135deg,${v.accent},${v.accentBtn})`;
+  document.getElementById('v-sector-label').textContent = v.label;
+
+  // Update exec summary border
+  document.querySelector('.exec-summary').style.borderLeftColor = v.accent;
+
+  // Re-render everything
+  renderAll(v);
+  rebuildCharts(v);
+}
+
+// ============================================================
+// RENDER ALL COMPONENTS
+// ============================================================
+function renderAll(v) {
+  // Banner
+  document.getElementById('banner-title').textContent = v.banner;
+  document.getElementById('banner-desc').textContent = v.bannerDesc;
+  document.getElementById('banner-btn').textContent = v.bannerBtn;
+  document.getElementById('attack-banner').style.display = 'flex';
+
+  // KPIs
+  document.getElementById('m-critical').textContent = v.critCount;
+  document.getElementById('m-high').textContent = v.highCount;
+  document.getElementById('m-incidents').textContent = v.incidents;
+  document.getElementById('m-incidents').style.color = v.accent;
+  document.getElementById('m-mttd').textContent = v.mttd;
+
+  // Posture ring
+  const circumference = 2 * Math.PI * 50;
+  const offset = circumference * (1 - v.posture / 100);
+  const ring = document.getElementById('posture-ring');
+  ring.setAttribute('stroke-dashoffset', offset.toFixed(1));
+  ring.setAttribute('stroke', v.ringColor);
+  document.getElementById('posture-num').textContent = v.posture;
+  document.getElementById('posture-num').style.color = v.ringColor;
+  const pg = document.getElementById('posture-grade');
+  pg.textContent = v.postureGrade;
+  pg.style.color = v.postureGradeColor;
+  pg.style.background = v.postureGradeBg;
+  document.getElementById('posture-title').textContent = v.postureTitle;
+
+  // Domain scores
+  document.getElementById('domain-scores').innerHTML = v.domains.map(d => `
+    <div class="domain-row">
+      <span class="domain-name">${d.name}</span>
+      <div class="domain-bar-wrap"><div class="domain-bar" style="width:${d.score}%;background:${d.color};"></div></div>
+      <span class="domain-val" style="color:${d.color};">${Math.round(d.score)}</span>
+    </div>`).join('');
+
+  // Attack prediction
+  document.getElementById('pred-pct').textContent = v.attackPct + '%';
+  document.getElementById('pred-pct').style.color = v.attackPct >= 75 ? 'var(--red)' : 'var(--orange)';
+  document.getElementById('pred-meter').style.width = v.attackPct + '%';
+  document.getElementById('pred-badge').textContent = v.attackPct >= 75 ? 'HIGH RISK' : 'ELEVATED';
+  document.getElementById('pred-badge').style.background = v.attackPct >= 75 ? 'var(--red-bg)' : 'var(--orange-bg)';
+  document.getElementById('pred-badge').style.color = v.attackPct >= 75 ? 'var(--red)' : 'var(--orange)';
+  document.getElementById('threat-indicators').innerHTML = [
+    {label:'Primary Vector', val:v.attackVector},
+    {label:'Secondary', val:v.attackSecondary},
+    {label:'Threat Actor', val:v.attackActor},
+    {label:'Confidence', val:v.attackConfidence},
+    {label:'Sources', val:v.attackSources},
+  ].map(i => `<div class="threat-item">
+    <div class="threat-dot" style="background:${i.label==='Primary Vector'?'var(--red)':i.label==='Secondary'?'var(--orange)':i.label==='Threat Actor'?'var(--purple)':i.label==='Confidence'?'var(--yellow)':'var(--accent)'};"></div>
+    <span class="threat-item-label">${i.label}</span>
+    <span class="threat-item-val" style="font-size:10px;">${i.val}</span>
+  </div>`).join('');
+
+  // Alert feed
+  document.getElementById('feed-badge').textContent = v.critCount + ' Critical';
+  const feedEl = document.getElementById('alert-feed');
+  feedEl.innerHTML = v.alerts.map(a => `
+    <div class="alert-row" style="border-left-color:${sevBorder(a.sev)};">
+      <span class="alert-sev ${sevClass(a.sev)}">${a.sev}</span>
+      <div class="alert-content">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-meta">${a.time} · ${a.region}</div>
+      </div>
+      <span class="alert-tool">${a.tool}</span>
+    </div>`).join('');
+
+  // Region table
+  document.getElementById('region-title').textContent = v.regionTitle;
+  document.getElementById('region-badge').textContent = v.regionBadge;
+  document.getElementById('cov-col-hdr').textContent = v.covColHdr;
+  document.getElementById('region-tbody').innerHTML = v.regionData.map(r => `
+    <tr>
+      <td><strong>${r.code}</strong> <span style="color:var(--text3);font-size:10px;">${r.name}</span></td>
+      <td><span class="risk-pill ${riskClass(r.risk)}">${r.risk}</span></td>
+      <td style="color:var(--red);font-weight:700;">${r.critical}</td>
+      <td style="color:var(--orange);font-weight:700;">${r.high}</td>
+      <td><div class="cov-bar-wrap"><div class="cov-bar-bg"><div class="cov-bar-fill" style="width:${r.cov}%;background:${r.cov<75?'var(--red)':r.cov<88?'var(--yellow)':'var(--green)'};"></div></div>
+        <span class="cov-val" style="color:${r.cov<75?'var(--red)':r.cov<88?'var(--yellow)':'var(--green)'};">${r.cov}%</span></div></td>
+      <td style="color:var(--text2);">${r.assets.toLocaleString()}</td>
+    </tr>`).join('');
+
+  // MITRE
+  document.getElementById('mitre-grid').innerHTML = v.mitre.map(m => `
+    <div class="mitre-cell" style="background:${m.col};" title="${m.t}: ${m.c}">
+      <div class="mitre-tactic">${m.t}</div>
+      <div class="mitre-count">${m.c}</div>
+    </div>`).join('');
+
+  // Severity legend
+  const sevLabels = ['Critical','High','Medium','Low','Info'];
+  const sevColors = ['#f43f5e','#fb923c','#fbbf24','#22d3a5','#4f8bff'];
+  document.getElementById('sev-legend').innerHTML = sevLabels.map((l,i) => `
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;">
+      <span style="width:9px;height:9px;border-radius:2px;background:${sevColors[i]};flex-shrink:0;"></span>
+      <span style="color:var(--text2);">${l}</span>
+      <span style="margin-left:auto;font-weight:700;color:var(--text);">${v.sevData[i]}</span>
+    </div>`).join('');
+
+  // Tool grid
+  document.getElementById('tool-status-badge').textContent = v.toolStatusBadge;
+  document.getElementById('tool-chart-title').textContent = v.toolChartTitle;
+  document.getElementById('cloud-chart-title').textContent = v.cloudChartTitle;
+  document.getElementById('tool-grid').innerHTML = v.tools.map(t => `
+    <div class="tool-item">
+      <div class="tool-status-dot" style="background:${t.s==='ok'?'var(--green)':'var(--yellow)'};"></div>
+      <span class="tool-name">${t.n}</span>
+      <span class="tool-count">${t.c}</span>
+    </div>`).join('');
+
+  // Exec summary
+  document.getElementById('exec-summary').innerHTML = v.execSummary;
+
+  // Compliance
+  document.getElementById('compliance-list').innerHTML = v.compliance.map(c => `
+    <div class="compliance-row">
+      <span class="compliance-name">${c.name}</span>
+      <div class="compliance-bar-wrap"><div class="compliance-bar-fill" style="width:${c.score}%;background:${c.score>=75?'#22d3a5':c.score>=62?'#fbbf24':'#f43f5e'};"></div></div>
+      <span class="compliance-score" style="color:${c.score>=75?'var(--green)':c.score>=62?'var(--yellow)':'var(--red)'};">${c.score}%</span>
+    </div>`).join('');
+
+  // Threat actors
+  document.getElementById('threat-actors').innerHTML = v.threatActors.map(a => `
+    <div style="padding:11px;background:var(--bg3);border-radius:7px;border-left:3px solid ${a.active?'var(--red)':'var(--orange)'};">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px;">
+        <span style="font-size:12px;font-weight:700;color:var(--text);">${a.name}</span>
+        <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:${a.active?'var(--red-bg)':'var(--orange-bg)'};color:${a.active?'var(--red)':'var(--orange)'};">${a.active?'ACTIVE':'MONITORING'}</span>
+        <span style="margin-left:auto;font-size:10px;color:var(--text3);">Conf: ${a.conf}</span>
+      </div>
+      <div style="font-size:10px;color:var(--text2);">${a.ttps}</div>
+    </div>`).join('');
+
+  // IOC summary
+  document.getElementById('ioc-summary').innerHTML = v.iocs.map(i => `
+    <div style="padding:12px;background:var(--bg3);border-radius:7px;text-align:center;">
+      <div style="font-size:18px;margin-bottom:5px;">${i.icon}</div>
+      <div style="font-size:20px;font-weight:700;color:var(--text);">${i.count}</div>
+      <div style="font-size:10px;color:var(--text2);">${i.type}</div>
+    </div>`).join('');
+
+  // Brand alerts
+  document.getElementById('brand-title').textContent = v.brandTitle;
+  document.getElementById('brand-alerts').innerHTML = v.brandAlerts.map(a => `
+    <div class="alert-row" style="border-left-color:${sevBorder(a.sev)};">
+      <span class="alert-sev ${sevClass(a.sev)}">${a.sev}</span>
+      <div class="alert-content">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-meta">${a.source}</div>
+      </div>
+      <span style="font-size:9px;padding:2px 7px;border-radius:4px;background:var(--blue-bg);color:var(--accent);font-weight:600;">${a.action}</span>
+    </div>`).join('');
+
+  // Asset view
+  document.getElementById('a-total').textContent = v.assetTotal;
+  document.getElementById('a-edr').textContent = v.assetEDR;
+  document.getElementById('a-vmdr').textContent = v.assetVMDR;
+  document.getElementById('a-gaps').textContent = v.assetGaps;
+  document.getElementById('asset-coverage-table').innerHTML = `
+    <table class="region-table" style="width:100%;">
+      <thead><tr>
+        <th>Region / Site</th><th>Total Assets</th>
+        <th>${v.assetEDRLabel}</th>
+        <th>${v.assetVMDRLabel}</th>
+        <th>Coverage Gap</th>
+      </tr></thead>
+      <tbody>${v.regionData.slice(0,8).map(r => {
+        const vmdr = Math.max(0, Math.min(100, r.cov - 2)).toFixed(1);
+        const gap = (100 - r.cov).toFixed(1);
+        return `<tr>
+          <td><strong>${r.code}</strong> <span style="color:var(--text3);font-size:10px;">${r.name}</span></td>
+          <td style="color:var(--text2);">${r.assets.toLocaleString()}</td>
+          <td><div class="cov-bar-wrap"><div class="cov-bar-bg"><div class="cov-bar-fill" style="width:${r.cov}%;"></div></div><span class="cov-val">${r.cov}%</span></div></td>
+          <td><div class="cov-bar-wrap"><div class="cov-bar-bg"><div class="cov-bar-fill" style="width:${vmdr}%;"></div></div><span class="cov-val">${vmdr}%</span></div></td>
+          <td style="color:${gap>20?'var(--red)':gap>10?'var(--yellow)':'var(--green)'};font-weight:700;">${gap}%</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+
+  // Full alert feed filter population
+  const toolFilter = document.getElementById('tool-filter');
+  const toolNames = [...new Set(v.tools.map(t=>t.n))].sort();
+  toolFilter.innerHTML = '<option value="">All Tools</option>' + toolNames.map(t=>`<option value="${t}">${t}</option>`).join('');
+  applyFullFeedFilters(v);
+
+  // Footer
+  document.getElementById('footer-controls').textContent = v.tools.length + ' Controls';
+}
+
+function applyFullFeedFilters(v) {
+  const sev = document.getElementById('sev-filter').value;
+  const tool = document.getElementById('tool-filter').value;
+  const all = [...v.alerts];
+  // Pad with generated alerts for the full feed view
+  const titles = v.alerts.map(a=>a.title);
+  const tools = v.tools.map(t=>t.n);
+  const regions = v.regionData.map(r=>r.code);
+  const sevPool = ['CRITICAL','CRITICAL','HIGH','HIGH','HIGH','MEDIUM','MEDIUM','MEDIUM','LOW'];
+  for (let i=all.length; i<180; i++) {
+    all.push({
+      sev: sevPool[Math.floor(Math.random()*sevPool.length)],
+      tool: tools[Math.floor(Math.random()*tools.length)],
+      title: titles[Math.floor(Math.random()*titles.length)],
+      time: `${Math.floor(Math.random()*72)+1}h ago`,
+      region: regions[Math.floor(Math.random()*regions.length)],
+    });
+  }
+  all.sort((a,b)=>{const o={CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3,INFO:4};return o[a.sev]-o[b.sev];});
+  const filtered = all.filter(a=>(!sev||a.sev===sev)&&(!tool||a.tool===tool));
+  document.getElementById('full-alert-feed').innerHTML = filtered.slice(0,250).map(a => `
+    <div class="alert-row" style="border-left-color:${sevBorder(a.sev)};">
+      <span class="alert-sev ${sevClass(a.sev)}">${a.sev}</span>
+      <div class="alert-content">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-meta">${a.time} · ${a.region}</div>
+      </div>
+      <span class="alert-tool">${a.tool}</span>
+    </div>`).join('');
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+const GC = 'rgba(99,120,200,0.08)';
+const TC = '#4a5880';
+
+function rebuildCharts(v) {
+  ['trendChart','toolChart','sevChart','mttrChart','cloudChart','complianceChart'].forEach(destroyChart);
+
+  // Posture trend
+  chartInstances['trendChart'] = new Chart(document.getElementById('trendChart'), {
+    type:'line',
+    data:{
+      labels: Array.from({length:30},(_,i)=>{const d=new Date();d.setDate(d.getDate()-(29-i));return d.getDate()+'/'+(d.getMonth()+1);}),
+      datasets:[{label:'Score',data:v.postureTrend,borderColor:v.accent,backgroundColor:v.accent+'14',fill:true,tension:.4,pointRadius:0,pointHoverRadius:3}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:GC},ticks:{color:TC,maxTicksLimit:8,font:{size:9}}},y:{min:30,max:85,grid:{color:GC},ticks:{color:TC,font:{size:9}}}}}
+  });
+
+  // Tool bar
+  const topTools = v.tools.slice(0,10);
+  chartInstances['toolChart'] = new Chart(document.getElementById('toolChart'), {
+    type:'bar',
+    data:{labels:topTools.map(t=>t.n),datasets:[{data:topTools.map(t=>t.c),backgroundColor:topTools.map((_,i)=>`hsl(${200+i*16},65%,55%)`),borderWidth:0,borderRadius:3}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:GC},ticks:{color:TC,font:{size:9}}},y:{grid:{display:false},ticks:{color:TC,font:{size:9}}}}}
+  });
+
+  // Severity donut
+  chartInstances['sevChart'] = new Chart(document.getElementById('sevChart'), {
+    type:'doughnut',
+    data:{labels:['Critical','High','Medium','Low','Info'],datasets:[{data:v.sevData,backgroundColor:['#f43f5e','#fb923c','#fbbf24','#22d3a5','#4f8bff'],borderWidth:0,hoverOffset:3}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}
+  });
+
+  // MTTR
+  const mttdBase = parseFloat(v.mttd);
+  const mttdTrend = Array.from({length:30},(_,i)=>Math.max(5,mttdBase*(1+0.5*Math.cos(i/5)+Math.random()*0.2)));
+  const mttrTrend = mttdTrend.map(d=>d*5+Math.random()*20);
+  chartInstances['mttrChart'] = new Chart(document.getElementById('mttrChart'), {
+    type:'line',
+    data:{labels:Array.from({length:30},(_,i)=>i+1),datasets:[
+      {label:'MTTD',data:mttdTrend,borderColor:'#4f8bff',tension:.4,pointRadius:0,borderWidth:1.5},
+      {label:'MTTR',data:mttrTrend,borderColor:'#fb923c',tension:.4,pointRadius:0,borderWidth:1.5,borderDash:[4,4]}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{grid:{color:GC},ticks:{color:TC,font:{size:9}}}}}
+  });
+
+  // Cloud/platform
+  chartInstances['cloudChart'] = new Chart(document.getElementById('cloudChart'), {
+    type:'bar',
+    data:{labels:v.cloudLabels,datasets:[{data:v.cloudData,backgroundColor:v.cloudColors,borderWidth:0,borderRadius:3}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:GC},ticks:{color:TC,font:{size:9}}},y:{grid:{display:false},ticks:{color:TC,font:{size:9}}}}}
+  });
+
+  // Compliance trend
+  const compLabels = Array.from({length:13},(_,i)=>{const d=new Date();d.setDate(d.getDate()-(90-i*7));return d.getDate()+'/'+(d.getMonth()+1);});
+  chartInstances['complianceChart'] = new Chart(document.getElementById('complianceChart'), {
+    type:'line',
+    data:{labels:compLabels,datasets:v.compliance.slice(0,4).map(c=>({
+      label:c.name,data:Array.from({length:13},(_,i)=>Math.min(100,Math.max(40,c.score-8+i*0.7+(Math.random()-.5)*3))),
+      borderColor:c.color,tension:.4,pointRadius:0,borderWidth:1.5
+    }))},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:GC},ticks:{color:TC,font:{size:9},maxTicksLimit:7}},y:{min:40,max:90,grid:{color:GC},ticks:{color:TC,font:{size:9}}}}}
+  });
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function switchView(view, btn) {
+  document.querySelectorAll('.view-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('last-update').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+
+  // Set enterprise button active styling
+  const eBtn = document.getElementById('vbtn-enterprise');
+  eBtn.style.background = VERTICALS.enterprise.accent;
+  eBtn.style.color = '#fff';
+
+  // Render enterprise (default)
+  renderAll(VERTICALS.enterprise);
+  setTimeout(() => rebuildCharts(VERTICALS.enterprise), 80);
+
+  // Filter listeners
+  document.getElementById('sev-filter').addEventListener('change', () => applyFullFeedFilters(VERTICALS[currentVertical]));
+  document.getElementById('tool-filter').addEventListener('change', () => applyFullFeedFilters(VERTICALS[currentVertical]));
+
+  // Live clock
+  setInterval(() => {
+    document.getElementById('last-update').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+  }, 30000);
+});
+</script>
+</body>
+</html>
