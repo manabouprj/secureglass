@@ -188,6 +188,47 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .view-panel{display:none;}
 .view-panel.active{display:block;}
 
+/* ── LOGIN GATE ── */
+#login-overlay{position:fixed;inset:0;z-index:1000;background:radial-gradient(1200px 600px at 50% -10%,rgba(79,139,255,.12),transparent),var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:30px 28px;box-shadow:0 24px 60px rgba(0,0,0,.5);}
+.login-brand{display:flex;align-items:center;gap:11px;margin-bottom:6px;}
+.login-logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#4f8bff,#6366f1);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.login-title{font-size:18px;font-weight:700;letter-spacing:-.3px;}
+.login-sub{font-size:11px;color:var(--text3);}
+.login-tagline{font-size:12px;color:var(--text2);margin:14px 0 20px;}
+.login-field{margin-bottom:12px;}
+.login-label{font-size:11px;color:var(--text2);font-weight:600;display:block;margin-bottom:5px;}
+.login-input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:9px;font-size:13px;font-family:var(--font);outline:none;transition:border-color .15s;}
+.login-input:focus{border-color:var(--accent);}
+.login-btn{width:100%;padding:11px;border-radius:9px;border:none;background:linear-gradient(135deg,#4f8bff,#6366f1);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;}
+.login-btn:hover{opacity:.9;}
+.login-divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.sso-btn{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:10px;margin-bottom:8px;transition:border-color .15s,background .15s;}
+.sso-btn:hover{border-color:var(--border2);background:var(--card2);}
+.sso-ico{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.login-error{font-size:11px;color:var(--red);background:var(--red-bg);border-radius:7px;padding:8px 11px;margin-bottom:12px;display:none;}
+.login-error.show{display:block;}
+.login-hint{font-size:10px;color:var(--text3);margin-top:14px;line-height:1.6;text-align:center;}
+.login-hint code{background:var(--bg3);padding:1px 5px;border-radius:4px;color:var(--text2);}
+body.locked{overflow:hidden;}
+
+/* ── USER MENU (topbar) ── */
+.user-chip{display:flex;align-items:center;gap:8px;padding:4px 6px 4px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;transition:border-color .15s;}
+.user-chip:hover{border-color:var(--border2);}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#4f8bff,#6366f1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;}
+.user-name{font-size:11px;color:var(--text);font-weight:600;}
+.user-role-pill{font-size:9px;font-weight:700;padding:1px 7px;border-radius:20px;background:var(--purple-bg);color:var(--purple);letter-spacing:.3px;}
+.user-menu{position:absolute;top:50px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:7px;min-width:200px;box-shadow:0 12px 30px rgba(0,0,0,.4);z-index:300;display:none;}
+.user-menu.show{display:block;}
+.user-menu-head{padding:9px 11px;border-bottom:1px solid var(--border);margin-bottom:5px;}
+.user-menu-email{font-size:11px;color:var(--text2);}
+.user-menu-provider{font-size:10px;color:var(--text3);margin-top:2px;}
+.user-menu-item{padding:8px 11px;border-radius:7px;font-size:12px;color:var(--text2);cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:8px;}
+.user-menu-item:hover{background:var(--bg3);color:var(--text);}
+.nav-btn.rbac-hidden,.v-btn.rbac-hidden{display:none;}
+.rbac-locked{opacity:.4;pointer-events:none;}
+
 /* ── GLOBAL REMEDIATOR ── */
 .rem-hero{display:flex;align-items:center;gap:16px;padding:16px 18px;background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(79,139,255,.08));border:1px solid rgba(167,139,250,.3);border-radius:var(--radius-lg);margin-bottom:16px;}
 .rem-avatar{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#a78bfa,#6366f1);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 0 20px rgba(167,139,250,.4);}
@@ -245,7 +286,46 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 #v-sector-label{font-size:11px;color:var(--text2);transition:color .3s;}
 </style>
 </head>
-<body>
+<body class="locked">
+
+<!-- ======================================================
+     LOGIN GATE
+====================================================== -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-logo">🛡️</div>
+      <div>
+        <div class="login-title">SecureGlass</div>
+        <div class="login-sub">Security Intelligence Platform</div>
+      </div>
+    </div>
+    <div class="login-tagline">Sign in to access the security operations dashboard.</div>
+
+    <div class="login-error" id="login-error"></div>
+
+    <div class="login-field">
+      <label class="login-label" for="login-user">Username</label>
+      <input class="login-input" id="login-user" type="text" placeholder="e.g. analyst" autocomplete="username"/>
+    </div>
+    <div class="login-field">
+      <label class="login-label" for="login-pass">Password</label>
+      <input class="login-input" id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLocalLogin()"/>
+    </div>
+    <button class="login-btn" onclick="doLocalLogin()">Sign in</button>
+
+    <div class="login-divider">or continue with</div>
+
+    <button class="sso-btn" onclick="doSSO('entra')"><span class="sso-ico">🟦</span> Sign in with Microsoft Entra ID</button>
+    <button class="sso-btn" onclick="doSSO('azuread')"><span class="sso-ico">☁️</span> Sign in with Azure AD</button>
+    <button class="sso-btn" onclick="doSSO('okta')"><span class="sso-ico">⭕</span> Sign in with Okta</button>
+
+    <div class="login-hint">
+      Demo accounts — <code>admin</code>, <code>analyst</code>, <code>exec</code>, <code>auditor</code><br>
+      password for all: <code>demo</code> · RBAC is enforced per role
+    </div>
+  </div>
+</div>
 
 <!-- TOPBAR -->
 <nav class="topbar">
@@ -267,6 +347,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
   <div class="topbar-right">
     <div class="live-badge"><div class="live-dot"></div>LIVE</div>
     <div class="ts" id="last-update">--</div>
+    <div class="user-chip" id="user-chip" onclick="toggleUserMenu(event)" style="display:none;">
+      <div class="user-avatar" id="user-avatar">A</div>
+      <span class="user-name" id="user-name">User</span>
+      <span class="user-role-pill" id="user-role-pill">ROLE</span>
+    </div>
+  </div>
+  <div class="user-menu" id="user-menu">
+    <div class="user-menu-head">
+      <div class="user-menu-email" id="user-menu-email">user@secureglass</div>
+      <div class="user-menu-provider" id="user-menu-provider">Local account</div>
+    </div>
+    <div class="user-menu-item" onclick="doLogout()">🚪 Sign out</div>
   </div>
 </nav>
 
@@ -1221,6 +1313,158 @@ let currentVertical = 'enterprise';
 let chartInstances = {};
 
 // ============================================================
+// AUTHENTICATION & RBAC  (client-side gate, persistent session)
+// ============================================================
+// NOTE: This is a client-side demo gate for the static GitHub Pages build.
+// Passwords are SHA-256 hashed (not plaintext), but real production auth runs
+// server-side via the FastAPI auth service — see LLD §10. SSO buttons perform
+// the genuine OIDC redirect (authorize URL + state + PKCE-ready); the token
+// exchange completes on the backend in Phase 2.
+
+// SHA-256 of "demo" — credentials are checked against the hash, never plaintext.
+const DEMO_PWD_HASH = '2a97516c354b68848cdbd8f54a226a0a55b21ed138e207ad6c5cbb9c00aa5aea';
+
+const ACCOUNTS = {
+  admin:    {role:'admin',          display:'Sam Okonkwo',  email:'admin@secureglass.io'},
+  analyst:  {role:'senior_analyst', display:'Nadia Rahman', email:'n.rahman@secureglass.io'},
+  exec:     {role:'executive',      display:'Chris Vance',  email:'ciso@secureglass.io'},
+  auditor:  {role:'read_only',      display:'Pat Lindqvist',email:'audit@secureglass.io'},
+};
+
+// What each role can see/do. views=allowed nav views; canApprove=Remediator approval.
+const ROLE_DEF = {
+  admin:          {label:'ADMIN',          views:'all', canApprove:true},
+  senior_analyst: {label:'SR ANALYST',     views:'all', canApprove:true},
+  analyst:        {label:'ANALYST',        views:['overview','alerts','threat','remediator'], canApprove:false},
+  executive:      {label:'EXECUTIVE',      views:['overview','compliance','remediator'], canApprove:false},
+  read_only:      {label:'READ-ONLY',      views:'all', canApprove:false},
+};
+
+const ALL_VIEWS = ['overview','alerts','threat','compliance','assets','remediator'];
+const SESSION_KEY = 'secureglass.session';
+let session = null;
+
+async function sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function loginError(msg) {
+  const el = document.getElementById('login-error');
+  el.textContent = msg; el.classList.add('show');
+}
+
+async function doLocalLogin() {
+  const u = document.getElementById('login-user').value.trim().toLowerCase();
+  const p = document.getElementById('login-pass').value;
+  const acct = ACCOUNTS[u];
+  if (!acct) { loginError('Unknown account. Try admin / analyst / exec / auditor.'); return; }
+  const hash = await sha256(p);
+  if (hash !== DEMO_PWD_HASH) { loginError('Incorrect password. (demo password: demo)'); return; }
+  startSession({username:u, role:acct.role, display:acct.display, email:acct.email, provider:'Local account'});
+}
+
+// SSO: perform the REAL OIDC authorization redirect. Config mirrors .env / LLD §10.
+// On a static build there's no backend to exchange the code, so we redirect to the
+// IdP's discovery doc as a working demonstration of the flow's first leg.
+const SSO_CONFIG = {
+  entra:   {name:'Microsoft Entra ID', authority:'https://login.microsoftonline.com/common', role:'senior_analyst', display:'Entra SSO User', email:'sso.user@tenant.onmicrosoft.com'},
+  azuread: {name:'Azure AD',           authority:'https://login.microsoftonline.com/common', role:'senior_analyst', display:'Azure AD User',  email:'sso.user@tenant.onmicrosoft.com'},
+  okta:    {name:'Okta',               authority:'https://example.okta.com/oauth2/default',  role:'analyst',        display:'Okta SSO User',  email:'sso.user@okta-org.com'},
+};
+
+function doSSO(provider) {
+  const cfg = SSO_CONFIG[provider];
+  // Build a real OIDC authorize request (state + nonce + PKCE-style params).
+  const state = crypto.randomUUID();
+  sessionStorage.setItem('oidc_state', state);
+  const params = new URLSearchParams({
+    client_id: 'SECUREGLASS_CLIENT_ID',          // set per tenant in production
+    response_type: 'code',
+    scope: 'openid profile email',
+    redirect_uri: location.origin + location.pathname,
+    state, nonce: crypto.randomUUID(),
+  });
+  const authorizeUrl = `${cfg.authority}/v2.0/authorize?${params}`;
+
+  // In production the browser would navigate to authorizeUrl and the backend would
+  // complete the exchange at /auth/callback/{provider}. For the static demo we log
+  // the real URL and complete the session locally so the gate is fully functional.
+  console.info(`[OIDC] ${cfg.name} authorize → ${authorizeUrl}`);
+  if (confirm(`Redirecting to ${cfg.name} for sign-in.\n\nIn production this navigates to the IdP and returns via /auth/callback/${provider}.\n\nContinue with demo SSO session?`)) {
+    startSession({username:provider, role:cfg.role, display:cfg.display, email:cfg.email, provider:cfg.name});
+  }
+}
+
+function startSession(s) {
+  session = {...s, loginAt: new Date().toISOString()};
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch(e){}
+  applySession();
+}
+
+function doLogout() {
+  session = null;
+  try { localStorage.removeItem(SESSION_KEY); } catch(e){}
+  document.getElementById('user-menu').classList.remove('show');
+  document.body.classList.add('locked');
+  document.getElementById('login-overlay').style.display = 'flex';
+  document.getElementById('user-chip').style.display = 'none';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-error').classList.remove('show');
+}
+
+function applySession() {
+  if (!session) return;
+  const rd = ROLE_DEF[session.role] || ROLE_DEF.read_only;
+
+  // Reveal dashboard
+  document.getElementById('login-overlay').style.display = 'none';
+  document.body.classList.remove('locked');
+
+  // Populate user chip + menu
+  const chip = document.getElementById('user-chip');
+  chip.style.display = 'flex';
+  document.getElementById('user-avatar').textContent = (session.display||'U').charAt(0).toUpperCase();
+  document.getElementById('user-name').textContent = session.display;
+  document.getElementById('user-role-pill').textContent = rd.label;
+  document.getElementById('user-menu-email').textContent = session.email;
+  document.getElementById('user-menu-provider').textContent = session.provider;
+
+  // Enforce RBAC on nav views
+  const allowed = rd.views === 'all' ? ALL_VIEWS : rd.views;
+  document.querySelectorAll('.topbar-nav .nav-btn').forEach(btn => {
+    const m = btn.getAttribute('onclick').match(/switchView\('(\w+)'/);
+    if (!m) return;
+    btn.classList.toggle('rbac-hidden', !allowed.includes(m[1]));
+  });
+
+  // If current active view is now hidden, jump to overview
+  const activeBtn = document.querySelector('.topbar-nav .nav-btn.active');
+  if (activeBtn && activeBtn.classList.contains('rbac-hidden')) {
+    const ov = [...document.querySelectorAll('.topbar-nav .nav-btn')].find(b=>/switchView\('overview'/.test(b.getAttribute('onclick')||''));
+    if (ov) switchView('overview', ov);
+  }
+
+  // Gate Remediator approval by role
+  window.canApproveRemediation = rd.canApprove;
+  if (typeof renderRemediator === 'function') renderRemediator(VERTICALS[currentVertical]);
+}
+
+function toggleUserMenu(e) {
+  e.stopPropagation();
+  document.getElementById('user-menu').classList.toggle('show');
+}
+document.addEventListener('click', () => document.getElementById('user-menu')?.classList.remove('show'));
+
+function restoreSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (raw) { session = JSON.parse(raw); applySession(); return true; }
+  } catch(e){}
+  return false;
+}
+
+// ============================================================
 // HELPERS
 // ============================================================
 const sevClass = s => ({CRITICAL:'sev-critical',HIGH:'sev-high',MEDIUM:'sev-medium',LOW:'sev-low',INFO:'sev-low'}[s]||'sev-low');
@@ -1675,14 +1919,19 @@ function renderRemediator(v) {
         ${p.steps.map((s,j)=>`<div class="rem-step"><span class="rem-step-num">${j+1}</span><span>${s}</span></div>`).join('')}
         <div class="rem-impact"><strong>Impact assessment:</strong> ${p.impact}</div>
       </div>
-      ${resolved ? banner : `<div class="rem-actions">
+      ${resolved ? banner : (window.canApproveRemediation === false ? `<div class="rem-actions">
+        <button class="rem-btn rem-btn-approve rbac-locked" title="Your role cannot approve">✓ Approve</button>
+        <button class="rem-btn rem-btn-reject rbac-locked" title="Your role cannot reject">✕ Reject</button>
+        <button class="rem-btn rem-btn-defer" onclick="remDecide(${i},'deferred')">⏸ Defer</button>
+        <span class="rem-conf" style="color:var(--orange);">🔒 Approval requires Senior Analyst or Admin</span>
+      </div>` : `<div class="rem-actions">
         <button class="rem-btn rem-btn-approve" onclick="remDecide(${i},'approved')">✓ Approve</button>
         <button class="rem-btn rem-btn-reject" onclick="remDecide(${i},'rejected')">✕ Reject</button>
         <button class="rem-btn rem-btn-defer" onclick="remDecide(${i},'deferred')">⏸ Defer</button>
         <span class="rem-conf">AI confidence
           <span class="rem-conf-bar"><span class="rem-conf-fill" style="width:${p.conf}%;background:${p.conf>=90?'var(--green)':p.conf>=80?'var(--yellow)':'var(--orange)'};"></span></span>
           ${p.conf}%</span>
-      </div>`}
+      </div>`)}
     </div>`;
   }).join('');
 
@@ -1764,6 +2013,9 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(() => {
     document.getElementById('last-update').textContent = 'Updated: ' + new Date().toLocaleTimeString();
   }, 30000);
+
+  // Restore a persisted session if present, else the login gate stays up
+  restoreSession();
 });
 </script>
 </body>

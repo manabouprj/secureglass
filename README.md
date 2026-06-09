@@ -150,6 +150,32 @@ Full 20-control mapping per vertical in [LLD.md](./docs/LLD.md)
 
 ---
 
+## 🔐 Authentication & Access
+
+SecureGlass supports four sign-in methods so it fits any enterprise identity stack. A single login
+page offers a local username/password form alongside three enterprise SSO buttons:
+
+| Method | Protocol | Notes |
+|--------|----------|-------|
+| **Local accounts** | Argon2id + TOTP MFA | Break-glass admin, demo, air-gapped |
+| **Microsoft Entra ID** | OIDC / SAML 2.0 | Primary SSO for Microsoft estates |
+| **Azure AD** | OIDC / SAML 2.0 | Same product as Entra ID (pre-2023 name) |
+| **Okta** | OIDC / SAML 2.0 | For Okta-standardised enterprises |
+
+After login, users are mapped to the existing RBAC roles (**Executive / Senior Analyst / Analyst /
+Admin / Read-Only**) via IdP group claims, with fail-closed defaults to least privilege. Role
+governs every view — including who may **approve Global Remediator actions** (Senior Analyst and
+Admin only). Full design, schema, and OIDC flow in [LLD.md §10](./docs/LLD.md) and
+[HLD.md §10](./docs/HLD.md).
+
+> **Working demo login.** The dashboard now ships with a functional client-side login gate and
+> enforced RBAC. Try the demo accounts `admin`, `analyst`, `exec`, `auditor` (password `demo`) and
+> watch the navigation and Remediator approval rights change per role. Sessions persist across
+> refreshes. The SSO buttons perform the real OIDC authorize redirect; the server-side token
+> exchange is the Phase 2 backend (LLD §10) — secrets cannot live in a static page.
+
+---
+
 ## 📂 Repository Structure
 
 ```
@@ -184,9 +210,12 @@ secureglass/
 - [x] Multi-vertical synthetic data generator
 - [x] 6-view dashboard with vertical-aware data
 - [x] **Global Remediator** — human-in-the-loop SOAR approval queue
+- [x] Authentication design (Local, Entra ID, Azure AD, Okta) — HLD/LLD §10
+- [x] **Working login gate** — client-side auth, persistent session, enforced RBAC, real OIDC redirect
 
 ### Phase 2 — Production Backend
 - [ ] FastAPI + PostgreSQL backend
+- [ ] Auth service: server-side OIDC token exchange (Entra ID / Okta), Argon2id + TOTP for local
 - [ ] Live CrowdStrike, Mimecast, Qualys connectors
 - [ ] Claude AI executive summary (live)
 - [ ] Global Remediator live plan generation + tool dispatch on approval
