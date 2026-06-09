@@ -2016,7 +2016,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Restore a persisted session if present, else the login gate stays up
   restoreSession();
+
+  // Attempt to use the live Phase 2 backend; fall back to bundled demo data.
+  tryConnectBackend();
 });
+
+// ============================================================
+// BACKEND CONNECTION (Phase 2) — fetch live data with demo fallback
+// ============================================================
+// If a SecureGlass API is reachable, the dashboard can pull real alerts from it.
+// Otherwise it silently uses the inline VERTICALS demo data (GitHub Pages mode).
+const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://127.0.0.1:8000' : '';   // set to your deployed API origin in production
+
+let backendOnline = false;
+
+async function tryConnectBackend() {
+  if (!API_BASE) { setDataSourceBadge(false); return; }
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 1500);
+    const resp = await fetch(`${API_BASE}/api/v1/health`, {signal: ctrl.signal});
+    clearTimeout(t);
+    if (resp.ok) {
+      const health = await resp.json();
+      backendOnline = true;
+      setDataSourceBadge(true, health.connectors);
+      console.info('[SecureGlass] Live backend connected', health);
+      // When authenticated, live alerts could replace demo data here:
+      //   const alerts = await fetchLiveAlerts();
+      //   if (alerts) applyLiveAlerts(alerts);
+    } else { setDataSourceBadge(false); }
+  } catch (e) {
+    setDataSourceBadge(false);  // backend not reachable — demo mode
+  }
+}
+
+function setDataSourceBadge(online, connectors) {
+  const el = document.getElementById('last-update');
+  if (!el) return;
+  if (online) {
+    const active = connectors ? Object.values(connectors).filter(Boolean).length : 0;
+    el.innerHTML = `<span style="color:var(--green);">● LIVE API</span> · ${active} connector(s)`;
+  }
+  // demo mode keeps the normal timestamp text
+}
+
+async function fetchLiveAlerts() {
+  if (!backendOnline || !session) return null;
+  try {
+    const resp = await fetch(`${API_BASE}/api/v1/alerts?vertical=${currentVertical}&limit=300`, {
+      headers: {'Authorization': `Bearer ${session.token || ''}`}
+    });
+    if (!resp.ok) return null;
+    return await resp.json();
+  } catch (e) { return null; }
+}
 </script>
 </body>
 </html>
